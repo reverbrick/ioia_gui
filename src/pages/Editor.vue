@@ -76,6 +76,7 @@ export default {
     },
     onSubmit () {
       this.loading = true
+      delete this.data.zalacznik
       if (this.$route.params.id !== '0') {
         this.$axios.put(`${this.api_link}/tresc/${this.$route.params.id}`, JSON.parse(JSON.stringify(this.data))
         )

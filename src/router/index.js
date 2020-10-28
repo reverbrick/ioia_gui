@@ -11,7 +11,7 @@ if (process.env.DEV) {
   Vue.prototype.api_link = '/api/v1'
 }
 
-Vue.prototype.app = 'Metalwit'
+Vue.prototype.app = 'Rejestracja czasu pracy'
 
 /*
  * If not building with SSR mode, you can

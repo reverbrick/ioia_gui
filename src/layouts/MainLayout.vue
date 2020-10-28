@@ -9,8 +9,6 @@
           <q-breadcrumbs-el :label="$route.meta.title" />
         </q-breadcrumbs>
         <q-space />
-        <q-btn flat dense @click="contact" icon="email" label="Kontakt"/>
-        <q-btn flat dense @click="meeting" icon="meeting_room" label="Spotkanie"/>
         <UserMenu ref="usermenu"/>
         <q-btn flat dense round color="white" @click="$q.fullscreen.toggle()" :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"/>
       </q-toolbar>

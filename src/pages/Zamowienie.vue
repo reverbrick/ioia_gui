@@ -25,11 +25,11 @@
             </template>
             <template v-slot:no-data="">
               <q-space />
-              <q-btn dense color="primary" :disable="loading" label="Dodaj pozycję" @click="addRow" />
+              <q-btn glossy icon="note_add" dense no-caps label="Dodaj" color="primary" :disable="loading" @click="addRow" />
             </template>
             <template v-slot:bottom>
               <q-space />
-              <q-btn dense color="primary" :disable="loading" label="Dodaj pozycję" @click="addRow" />
+              <q-btn glossy icon="note_add" dense no-caps label="Dodaj" color="primary" :disable="loading" @click="addRow" />
             </template>
           </q-table>
         </div>

@@ -1,9 +1,30 @@
 <template>
   <q-table dense :data="data" :title="title" :columns="columns" :pagination.sync="pagination" :loading="loading" :filter="filter" @request="loadData" binary-state-sort separator="cell" @row-click="editRow">
     <template v-slot:top-right>
-      <q-btn class="q-ml-sm" dense color="primary" glossy icon="note_add" @click="openPopup(true)" />
-      <q-btn class="q-ml-sm" color="info" dense glossy icon="file_copy" label="CSV" no-caps @click="csv"/>
-      <q-btn class="q-ml-sm" color="amber" dense glossy icon-right="refresh" @click="refresh" />
+      <q-btn-group>
+        <q-btn glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="openPopup(true)" />
+        <q-input class="q-ml-sm" dense debounce="300" ref="search" v-model="filter" placeholder="Szukaj" v-on:change.prevent="loadData()">
+          <template v-slot:append>
+            <q-icon v-if="filter !== ''" name="clear" class="cursor-pointer" @click="resetSearch" />
+            <q-icon name="search" />
+          </template>
+        </q-input>
+        <q-btn-dropdown glossy icon="search" dense no-caps label="Filtry" color="primary">
+          <q-form class="q-gutter-md">
+            <q-card-section class="q-pt-none q-gutter-md">
+              <template v-for="(item, i) in filters">
+                <q-toggle v-if="item.type=='boolean'" stack-label :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
+                <q-input v-else stack-label :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
+              </template>
+            </q-card-section>
+            <q-card-actions align="right" class="bg-white text-teal">
+              <q-btn label="Zapisz" type="submit" color="primary"/>
+              <q-btn label="Anuluj" type="reset" color="primary" v-close-popup />
+            </q-card-actions>
+          </q-form>
+        </q-btn-dropdown>
+        <q-btn glossy icon="file_copy" dense no-caps label="Eksport" color="primary" @click="csv"/>
+      </q-btn-group>
     </template>
   </q-table>
 </template>
@@ -23,17 +44,22 @@ export default {
         rowsPerPage: 10,
         rowsNumber: 10
       },
+      filters: [],
       data: [],
       columns: [],
       title: ''
     }
   },
-  mounted: function () {
-    // this.loadData()
-  },
   watch: {
     '$route.params.id': {
       handler: function () {
+        this.pagination = {
+          sortBy: '',
+          descending: false,
+          page: 1,
+          rowsPerPage: 10,
+          rowsNumber: 10
+        }
         this.loadData()
       },
       deep: true,
@@ -58,8 +84,19 @@ export default {
         })
       }
     },
-    loadData () {
-      axiosGet(this, this.model, 'data', `${this.model}/`, this.loadCallback)
+    loadData (props) {
+      if (typeof props !== 'undefined') {
+        this.pagination = props.pagination
+      }
+      var q = ''
+      var dir = 'asc'
+      if (this.pagination.descending) {
+        dir = 'desc'
+      }
+      if (this.pagination.sortBy) {
+        q = `?q=(order_column:${this.pagination.sortBy},order_direction:${dir})`
+      }
+      axiosGet(this, this.model, 'data', `${this.model}/${q}`, this.loadCallback)
     },
     openPopup (val) {
       // this.$emit('openPopup', val)
@@ -74,9 +111,6 @@ export default {
         message: 'Export',
         color: 'info'
       })
-    },
-    refresh () {
-      this.loadData()
     },
     resetSearch () {
       this.filter = ''

@@ -3,7 +3,7 @@
     <q-card-section>
       <div class="text-h6">{{ title }}</div>
     </q-card-section>
-    <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+    <q-form autofocus @submit="onSubmit" @reset="onReset" class="q-gutter-md">
       <q-card-section class="q-pt-none q-gutter-md">
         <template v-for="(item, i) in fields">
           <q-toggle v-if="item.type=='boolean'" stack-label :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>

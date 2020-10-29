@@ -11,7 +11,7 @@ if (process.env.DEV) {
   Vue.prototype.api_link = '/api/v1'
 }
 
-Vue.prototype.app = 'Metalwit'
+// Vue.prototype.$app = 'Metalwit'
 
 /*
  * If not building with SSR mode, you can
@@ -34,6 +34,7 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
+    // if ( to.path === '/')
     if (!localStorage.getItem('access') && to.path !== '/login' && to.path) next('/login')
     else next()
   })

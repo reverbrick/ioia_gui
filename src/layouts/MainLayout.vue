@@ -33,6 +33,7 @@
 import Menu from 'components/Menu'
 import UserMenu from 'components/UserMenu'
 import Branding from 'components/Branding'
+import { axiosGet } from '../boot/ioia.js'
 export default {
   name: 'MainLayout',
   components: {
@@ -59,22 +60,12 @@ export default {
       var win = window.open('https://meet.google.com/maq-ueyr-zzn', '_blank')
       win.focus()
     },
+    loadCallback (data) {
+      this.$refs.usermenu.data = data.data
+      this.$refs.branding.app = data.data.app
+    },
     loadData (props) {
-      this.loading = true
-      this.$axios.get(`${this.api_link}/userinfo/`)
-        .then((response) => {
-          this.$refs.usermenu.data = response.data.data
-          this.loading = false
-        })
-        .catch(() => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'top',
-            message: 'Wystąpił błąd przy ładowaniu elementu Dane użytkownika!',
-            icon: 'report_problem'
-          })
-          this.loading = false
-        })
+      axiosGet(this, 'UserInfo', null, 'userinfo/', this.loadCallback)
     }
   }
 }

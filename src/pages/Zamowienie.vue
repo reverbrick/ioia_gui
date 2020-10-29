@@ -99,7 +99,12 @@
           </q-card-section>
           <q-form @submit="onSubmit2" class="q-gutter-md">
             <q-card-section class="q-pt-none q-gutter-md">
-              <q-input dense v-bind:key="item.field" :type="item.type" :required="item.required" v-for="(item, i) in fields" filled v-model="form_data[fields[i].field]" :label="item.label" />
+              <template v-for="(item, i) in fields">
+                <q-toggle v-if="item.type=='boolean'" stack-label :required="item.required" v-bind:key="item.field" v-model="form_data[fields[i].field]" :label="item.label" :type="item.type"/>
+                <q-select v-if="item.type=='select'" emit-value map-options dense filled :required="item.required" v-bind:key="item.field" v-model="form_data[fields[i].field]" :options="op_jm" :label="item.label" :type="item.type"/>
+                <!--<q-input v-else stack-label :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>-->
+                <q-input v-else dense v-bind:key="item.field" :type="item.type" :required="item.required" filled v-model="form_data[fields[i].field]" :label="item.label" />
+              </template>
             </q-card-section>
             <q-card-actions align="right" class="bg-white text-teal">
               <q-btn dense label="Zamknij" type="submit" color="primary" />
@@ -130,7 +135,8 @@ export default {
         { name: 'produkt', label: 'Produkt *', field: 'produkt', required: true, type: 'text' },
         { name: 'producent', label: 'Producent *', field: 'producent', required: true, type: 'text' },
         { name: 'link', label: 'Link', field: 'link', type: 'text' },
-        { name: 'ilosc', label: 'Ilość *', field: 'ilosc', required: true, type: 'number' }
+        { name: 'ilosc', label: 'Ilość *', field: 'ilosc', required: true, type: 'number' },
+        { name: 'jm', label: 'JM', field: 'jm_id', required: false, type: 'select' }
       ],
       columns: [
         { name: 'id', label: 'Lp', field: 'id', sortable: false, align: 'left' },
@@ -138,8 +144,10 @@ export default {
         { name: 'producent', label: 'Producent', field: 'producent', sortable: false, align: 'left' },
         { name: 'link', label: 'Link', field: 'link', sortable: false, align: 'left' },
         { name: 'ilosc', label: 'Ilość', field: 'ilosc', sortable: false, align: 'left' }
+        // { name: 'jm', label: 'JM', field: 'jm', sortable: false, align: 'left' }
       ],
       op_nr_proj: [],
+      op_jm: [],
       op_priorytet: [
         { label: 'Termin', value: 'termin' },
         { label: 'Cena', value: 'cena' },
@@ -208,6 +216,8 @@ export default {
     loadData (props) {
       // project list
       axiosGet(this, 'Projekty', 'op_nr_proj', 'projekt?q=(keys:!(none))&format=zamowienie')
+      // jm list
+      axiosGet(this, 'JM', 'op_jm', 'jm?q=(keys:!(none))&format=zamowienie')
       // populate form
       if (this.$route.params.id !== '0') {
         axiosGet(this, 'Zamówienie', 'data', `zamowienie/${this.$route.params.id}?q=(keys:!(none))`)

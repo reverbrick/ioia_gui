@@ -1,5 +1,6 @@
 <template>
   <div class="q-pa-md">
+    klient
     <daykeep-calendar calendar-locale="pl" :tab-labels="labels" :showCards="show" :event-array="data" />
     <q-drawer side="right" show-if-above bordered :width="280" :breakpoint="500" content-class="bg-grey-3">
       <div class="q-pa-md q-gutter-sm">

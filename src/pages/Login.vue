@@ -9,7 +9,7 @@
           <div class="row">
             <q-card square bordered class="q-pa-lg shadow-1">
               <q-card-section>
-                <q-form autofocus class="q-gutter-md" v-touch-repeat.enter="click">
+                <q-form autofocus class="q-gutter-md"><!-- v-touch-repeat.enter="click">-->
                   <q-input square filled clearable v-model="user" type="text" label="użytkownik" />
                   <q-input square filled clearable v-model="password" type="password" label="hasło" />
                 </q-form>

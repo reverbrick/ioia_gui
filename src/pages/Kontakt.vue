@@ -45,15 +45,15 @@ export default {
     return {
       kontakty: [
         { nazwisko: 'Budzińska Joanna', stanowisko: 'Koordynator/planista', telefon: '782 398 511', email: 'budzinska@metalwit.pl' },
-        { nazwisko: 'Daniel Górny', stanowisko: 'Programista systemów', telefon: '517 451 563', email: 'dadmin.dgor@gmail.com' },
-        { nazwisko: 'Jarmoła Adam', stanowisko: 'Specjalista od bezpieczeństwa', telefon: '796 785 347', email: 'yarmoua@gmail.com' },
-        { nazwisko: 'Jurkiewicz Wojciech', stanowisko: 'Wsparcie konstrukcyjne', telefon: '730 366 087', email: 'jurkiewicz@metalwit.pl', email2: 'kontakt@wojciech-jurkiewicz.net' },
-        { nazwisko: 'Kannenberg Tomasz', stanowisko: 'Konstruktor', telefon: '792 727 398', email: 'kannenberg@metalwit.pl', email2: 'introcad@wp.pl' },
-        { nazwisko: 'Madej Michał', stanowisko: 'Automatyk/programista', telefon: '510 378 845', email: 'madej@metalwit.pl', email2: 'm.madej@hotmail.com' },
+        // { nazwisko: 'Daniel Górny', stanowisko: 'Programista systemów', telefon: '517 451 563', email: 'dadmin.dgor@gmail.com' },
+        // { nazwisko: 'Jarmoła Adam', stanowisko: 'Specjalista od bezpieczeństwa', telefon: '796 785 347', email: 'yarmoua@gmail.com' },
+        // { nazwisko: 'Jurkiewicz Wojciech', stanowisko: 'Wsparcie konstrukcyjne', telefon: '730 366 087', email: 'jurkiewicz@metalwit.pl', email2: 'kontakt@wojciech-jurkiewicz.net' },
+        // { nazwisko: 'Kannenberg Tomasz', stanowisko: 'Konstruktor', telefon: '792 727 398', email: 'kannenberg@metalwit.pl', email2: 'introcad@wp.pl' },
+        // { nazwisko: 'Madej Michał', stanowisko: 'Automatyk/programista', telefon: '510 378 845', email: 'madej@metalwit.pl', email2: 'm.madej@hotmail.com' },
         { nazwisko: 'Nadolski Łukasz', stanowisko: 'Boss in Metalwit', telefon: '606 296 004', email: 'nadolski@metalwit.pl' },
-        { nazwisko: 'Pasela Monika', stanowisko: 'Koordynator/wsparcie projektowe', telefon: '535 560 498', email: 'pasela@metalwit.pl' },
-        { nazwisko: 'Reimann Krzysztof', stanowisko: 'Montażysta/automatyk', telefon: '534 121 202', email: 'k.reimann2@gmail.com' },
-        { nazwisko: 'Wyrwicki Łukasz', stanowisko: 'Programista', telefon: '660 434 252', email: 'wyrwicki@metalwit.pl' }
+        { nazwisko: 'Pasela Monika', stanowisko: 'Koordynator/wsparcie projektowe', telefon: '535 560 498', email: 'pasela@metalwit.pl' }
+        // { nazwisko: 'Reimann Krzysztof', stanowisko: 'Montażysta/automatyk', telefon: '534 121 202', email: 'k.reimann2@gmail.com' },
+        // { nazwisko: 'Wyrwicki Łukasz', stanowisko: 'Programista', telefon: '660 434 252', email: 'wyrwicki@metalwit.pl' }
       ]
     }
   }

@@ -1,7 +1,7 @@
 import Main from 'layouts/MainLayout.vue'
 import Editor from 'pages/Editor.vue'
 import Index from 'pages/Index.vue'
-import Podsumowanie from 'pages/Podsumowanie.vue'
+import Zalozenia from 'pages/Zalozenia.vue'
 import List from 'pages/List.vue'
 import Form from 'pages/Form.vue'
 import ListEdit from 'pages/List_edit.vue'
@@ -16,7 +16,7 @@ const routes = [
   { path: '/login', component: Login },
   { path: '/table2', component: Main, children: [{ path: '', component: Table2 }] },
   { path: '/', component: Main, children: [{ path: '', component: Index, meta: { title: '' } }] },
-  { path: '/:app', component: Main, children: [{ path: '', component: Podsumowanie, meta: { title: 'Podsumowanie' } }] },
+  { path: '/:app', component: Main, children: [{ path: '', component: Zalozenia, meta: { title: 'Założenia projektu' } }] },
   { path: '/list/:id', component: Main, children: [{ path: '', component: List, meta: { title: 'Lista' } }] },
   { path: '/:app/list/:id', component: Main, children: [{ path: '', component: List, meta: { title: 'Lista' } }] },
   { path: '/list_edit/:id', component: Main, children: [{ path: '', component: ListEdit, meta: { title: 'Lista' } }] },

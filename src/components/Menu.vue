@@ -65,10 +65,12 @@ export default {
       }
     },
     loadData () {
+      /*
       this.$axios.get(`${this.api_link}/menu1/`)
         .then((response) => {
           this.menu = response.data.data
         })
+      */
     }
   }
 }

@@ -5,7 +5,7 @@ import Podsumowanie from 'pages/Podsumowanie.vue'
 import List from 'pages/List.vue'
 import Form from 'pages/Form.vue'
 import ListEdit from 'pages/List_edit.vue'
-import Table2 from 'pages/Table2.vue'
+import Table from 'pages/Table.vue'
 import Login from 'pages/Login.vue'
 import FormZamowienie from 'pages/Zamowienie.vue'
 import Zadania from 'pages/Zadania.vue'
@@ -14,7 +14,7 @@ import Kontakt from 'pages/Kontakt.vue'
 const routes = [
   { path: '/kontakt', component: Main, children: [{ path: '', component: Kontakt, meta: { title: 'Kontakt' } }] },
   { path: '/login', component: Login },
-  { path: '/table2', component: Main, children: [{ path: '', component: Table2 }] },
+  { path: '/table', component: Main, children: [{ path: '', component: Table }] },
   { path: '/', component: Main, children: [{ path: '', component: Index, meta: { title: '' } }] },
   { path: '/:app', component: Main, children: [{ path: '', component: Podsumowanie, meta: { title: 'Podsumowanie' } }] },
   { path: '/list/:id', component: Main, children: [{ path: '', component: List, meta: { title: 'Lista' } }] },

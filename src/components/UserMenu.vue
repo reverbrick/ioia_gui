@@ -31,8 +31,7 @@ export default {
   },
   methods: {
     logout (val) {
-      localStorage.setItem('access', '')
-      localStorage.setItem('refresh', '')
+      localStorage.setItem('token', '')
       this.$router.push('/login')
       // location.replace('/logout')
     }

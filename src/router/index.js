@@ -34,7 +34,7 @@ export default function ({ store }) {
   })
 
   Router.beforeEach((to, from, next) => {
-    if (!localStorage.getItem('access') && to.path !== '/login' && to.path) next('/login')
+    if (!localStorage.getItem('token') && to.path !== '/login' && to.path) next('/login')
     else next()
   })
 

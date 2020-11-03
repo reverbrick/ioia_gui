@@ -39,7 +39,7 @@ export default {
     Branding
   },
   mounted: function () {
-    this.loadData()
+    // this.loadData()
   },
   data () {
     return {

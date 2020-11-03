@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 export default {
   name: 'Login',
   data () {
@@ -40,26 +41,34 @@ export default {
   methods: {
     click () {
       this.loading = true
-      this.$axios.post(`${this.api_link}/security/login`, { username: this.user, password: this.password, provider: 'db', refresh: true }
-      )
-        .then((response) => {
-          this.loading = false
-          localStorage.setItem('access', response.data.access_token)
-          localStorage.setItem('refresh', response.data.refresh_token)
-          this.$router.push('/')
+      this.$apollo.mutate({
+        // Query
+        mutation: gql`mutation ($user: String!, $password: String!) {
+          authenticate(input: {email: $user, password: $password}) {
+            jwtToken
+          }
+        }`,
+        variables: {
+          user: this.user,
+          password: this.password
+        }
+      }).then((data) => {
+        this.loading = false
+        localStorage.setItem('token', data.data.authenticate.jwtToken)
+        this.$router.push('/')
+      }).catch((error) => {
+        this.$q.notify({
+          color: 'negative',
+          position: 'top',
+          message: error,
+          icon: 'report_problem'
         })
-        .catch(() => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'top',
-            message: 'Wystąpił problem z logowaniem!',
-            icon: 'report_problem'
-          })
-          this.loading = false
-        })
+        this.loading = false
+      })
     }
   }
 }
+
 </script>
 
 <style>

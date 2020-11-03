@@ -3,5 +3,8 @@
   "@quasar/qmarkdown": {
     "import_md": false,
     "import_vmd": false
+  },
+  "@quasar/apollo": {
+    "graphql_uri": "http://localhost/graphql"
   }
 }

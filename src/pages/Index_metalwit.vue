@@ -70,10 +70,10 @@ export default {
           summary: 'Testowe zdarzenie',
           description: 'Test test...',
           start: {
-            dateTime: '2020-10-17' // timezone embedded in dateTime
+            dateTime: '2020-11-17' // timezone embedded in dateTime
           },
           end: {
-            dateTime: '2020-10-17'
+            dateTime: '2020-11-17'
           }
         }
       ]

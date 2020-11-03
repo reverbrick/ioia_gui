@@ -85,10 +85,10 @@ export default {
           summary: 'Testowe zdarzenie',
           description: 'Test test...',
           start: {
-            dateTime: '2020-10-17' // timezone embedded in dateTime
+            dateTime: '2020-11-17' // timezone embedded in dateTime
           },
           end: {
-            dateTime: '2020-10-17'
+            dateTime: '2020-11-17'
           }
         }
       ]
@@ -101,7 +101,7 @@ export default {
     },
     showMarkdown (doc) {
       this.loading = true
-      this.$axios.get(`${this.api_link}/tresc/get/${doc}`)
+      this.$axios.get(`${this.api_link}/tresc/get/${this.$route.params.app}/${doc}`)
         .then((response) => {
           this.markdown = response.data.data
           this.popup_md = true

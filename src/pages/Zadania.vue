@@ -83,7 +83,7 @@ export default {
     this.loadData()
   },
   watch: {
-    '$route.params.id': {
+    $route: {
       handler: function () {
         this.loadData()
       },

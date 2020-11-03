@@ -10,6 +10,7 @@ import Login from 'pages/Login.vue'
 import FormZamowienie from 'pages/Zamowienie.vue'
 import Zadania from 'pages/Zadania.vue'
 import Kontakt from 'pages/Kontakt.vue'
+import Markdown from 'pages/Markdown.vue'
 
 const routes = [
   { path: '/kontakt', component: Main, children: [{ path: '', component: Kontakt, meta: { title: 'Kontakt' } }] },
@@ -25,6 +26,7 @@ const routes = [
   { path: '/:app/zadania/:id', component: Main, children: [{ path: '', component: Zadania, meta: { title: 'Zadania' } }] },
   { path: '/tresc/:id', component: Main, children: [{ path: '', component: Editor, meta: { title: 'Treści' } }] },
   { path: '/:model/:id', component: Main, children: [{ path: '', component: Form, meta: { title: 'Formularz' } }] },
+  { path: '/:app/markdown/:id', component: Main, children: [{ path: '', component: Markdown, meta: { title: 'Strona' } }] },
   { path: '/:app/:model/:id', component: Main, children: [{ path: '', component: Form, meta: { title: 'Formularz' } }] },
   { path: '/test', component: Main }
 ]

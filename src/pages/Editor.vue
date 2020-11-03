@@ -1,6 +1,7 @@
 <template>
   <div class="q-pa-md q-gutter-sm fit">
     <q-input filled dense v-model="data.nazwa" label="Nazwa" />
+    <q-input filled dense v-model="data.app" label="Aplikacja" />
     <q-splitter v-model="splitterModel" style="height: 670px;">
       <template v-slot:separator>
         <q-avatar color="primary" text-color="white" size="28px" icon="sync_alt" />

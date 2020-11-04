@@ -1,21 +1,25 @@
 import Main from 'layouts/MainLayout.vue'
+/*
 import Editor from 'pages/Editor.vue'
-import Index from 'pages/Index.vue'
 import Podsumowanie from 'pages/Podsumowanie.vue'
 import List from 'pages/List.vue'
 import Form from 'pages/Form.vue'
 import ListEdit from 'pages/List_edit.vue'
 import Table from 'pages/Table.vue'
-import Login from 'pages/Login.vue'
 import FormZamowienie from 'pages/Zamowienie.vue'
 import Zadania from 'pages/Zadania.vue'
 import Kontakt from 'pages/Kontakt.vue'
+*/
+import Login from 'pages/Login.vue'
+import Index from 'pages/Index.vue'
+import Table from 'components/Table.vue'
 
 const routes = [
-  { path: '/kontakt', component: Main, children: [{ path: '', component: Kontakt, meta: { title: 'Kontakt' } }] },
   { path: '/login', component: Login },
-  { path: '/table', component: Main, children: [{ path: '', component: Table }] },
   { path: '/', component: Main, children: [{ path: '', component: Index, meta: { title: '' } }] },
+  { path: '/table/:model', component: Main, children: [{ path: '', component: Table, meta: { title: 'Tabela' } }] }
+  /*
+  { path: '/table', component: Main, children: [{ path: '', component: Table }] },
   { path: '/:app', component: Main, children: [{ path: '', component: Podsumowanie, meta: { title: 'Podsumowanie' } }] },
   { path: '/list/:id', component: Main, children: [{ path: '', component: List, meta: { title: 'Lista' } }] },
   { path: '/:app/list/:id', component: Main, children: [{ path: '', component: List, meta: { title: 'Lista' } }] },
@@ -27,6 +31,7 @@ const routes = [
   { path: '/:model/:id', component: Main, children: [{ path: '', component: Form, meta: { title: 'Formularz' } }] },
   { path: '/:app/:model/:id', component: Main, children: [{ path: '', component: Form, meta: { title: 'Formularz' } }] },
   { path: '/test', component: Main }
+  */
 ]
 
 // Always leave this as last one

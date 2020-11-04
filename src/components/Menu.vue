@@ -23,7 +23,34 @@
 </template>
 
 <script>
+import gql from 'graphql-tag'
 export default {
+  apollo: {
+    menus: {
+      query: gql`
+        query {
+          menus(filter: {parent: {isNull: true}}) {
+            nodes {
+              nodeId
+              name
+              label
+              link
+              icon
+              menusByParent {
+                nodes {
+                  nodeId
+                  name
+                  label
+                  link
+                  icon
+                }
+              }
+            }
+          }
+        }
+      `
+    }
+  },
   data () {
     return {
       filter: '',
@@ -46,12 +73,30 @@ export default {
       if (newVal === 'swagger') {
         location.replace('/swagger/v1')
       }
+    },
+    menus () {
+      this.menu = this.formatMenu(this.menus)
+      this.$nextTick(() => { this.$refs.tree.expandAll() })
     }
   },
-  mounted: function () {
-    this.loadData()
-  },
   methods: {
+    formatMenu (menus) {
+      var out = []
+      menus.nodes.forEach((value) => {
+        var mnu = { id: value.nodeId, name: value.name, label: value.label, link: value.link }
+        if (value.icon) {
+          mnu.icon = value.icon
+        }
+        if (!value.link) {
+          mnu.selectable = false
+        }
+        if (value.menusByParent) {
+          mnu.children = this.formatMenu(value.menusByParent)
+        }
+        out.push(mnu)
+      })
+      return out
+    },
     resetFilter () {
       this.filter = ''
       this.$refs.filter.focus()
@@ -63,14 +108,6 @@ export default {
           this.$router.push(link)
         }
       }
-    },
-    loadData () {
-      /*
-      this.$axios.get(`${this.api_link}/menu1/`)
-        .then((response) => {
-          this.menu = response.data.data
-        })
-      */
     }
   }
 }

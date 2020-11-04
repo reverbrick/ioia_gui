@@ -1,5 +1,5 @@
 <template>
-  <q-btn flat dense :label="data.last_name+' '+data.first_name" icon="person">
+  <q-btn flat dense :label="data.lastName+' '+data.firstName" icon="person">
     <q-menu>
       <div class="row no-wrap q-pa-md">
         <div class="column">
@@ -12,7 +12,7 @@
           <q-avatar size="72px">
             <img src="https://cdn.quasar.dev/img/boy-avatar.png">
           </q-avatar>
-          <div class="text-subtitle1 q-mt-md q-mb-xs">{{data.last_name}} {{data.first_name}}<br/>({{data.username}})</div>
+          <div class="text-subtitle1 q-mt-md q-mb-xs">{{data.lastName}} {{data.firstName}}<br/>({{data.email}})</div>
           <q-btn color="primary" label="Wyloguj" @click="logout" push size="sm" v-close-popup />
         </div>
       </div>
@@ -25,7 +25,7 @@ export default {
   data () {
     return {
       b1: false,
-      b2: true,
+      b2: false,
       data: {}
     }
   },

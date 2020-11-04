@@ -5,7 +5,6 @@
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen" icon="menu" aria-label="Menu"/>
         <q-breadcrumbs active-color="white" style="font-size: 16px">
           <q-breadcrumbs-el label="Strona główna" icon="home" @click="home"/>
-          <q-breadcrumbs-el v-if="$route.params.app" :label="$route.params.app" icon="apps"/>
           <q-breadcrumbs-el :label="$route.meta.title" />
         </q-breadcrumbs>
         <q-space />
@@ -31,15 +30,31 @@
 import Menu from 'components/Menu'
 import UserMenu from 'components/UserMenu'
 import Branding from 'components/Branding'
+import gql from 'graphql-tag'
 export default {
   name: 'MainLayout',
+  apollo: {
+    currentUser: {
+      query: gql`
+        query {
+          currentUser {
+            lastName
+            email
+            firstName
+          }
+        }
+      `
+    }
+  },
   components: {
     Menu,
     UserMenu,
     Branding
   },
-  mounted: function () {
-    // this.loadData()
+  watch: {
+    currentUser () {
+      this.$refs.usermenu.data = this.currentUser
+    }
   },
   data () {
     return {
@@ -49,30 +64,6 @@ export default {
   methods: {
     home () {
       this.$router.push('/')
-    },
-    contact () {
-      this.$router.push('/kontakt')
-    },
-    meeting () {
-      var win = window.open('https://meet.google.com/maq-ueyr-zzn', '_blank')
-      win.focus()
-    },
-    loadData (props) {
-      this.loading = true
-      this.$axios.get(`${this.api_link}/userinfo/`)
-        .then((response) => {
-          this.$refs.usermenu.data = response.data.data
-          this.loading = false
-        })
-        .catch(() => {
-          this.$q.notify({
-            color: 'negative',
-            position: 'top',
-            message: 'Wystąpił błąd przy ładowaniu elementu Dane użytkownika!',
-            icon: 'report_problem'
-          })
-          this.loading = false
-        })
     }
   }
 }

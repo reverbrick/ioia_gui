@@ -9,7 +9,7 @@
           <q-toggle v-if="item.type=='boolean'" stack-label :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
           <q-input v-else stack-label :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
         </template>
-        <Attachment v-if="data.zalacznik_" ref="zalacznik" label="Załączniki" max="3" :model="model" :id="id" :list="data.zalacznik" />
+        <!--<Attachment v-if="data.zalacznik_" ref="zalacznik" label="Załączniki" max="3" :model="model" :id="id" :list="data.zalacznik" />-->
       </q-card-section>
       <q-card-actions align="right" class="bg-white text-teal">
         <q-btn label="Zapisz" type="submit" color="positive"/>
@@ -21,88 +21,105 @@
 </template>
 
 <script>
-import { axiosGet, axiosDelete, axiosPut, axiosPost } from '../boot/ioia.js'
-import Attachment from 'components/Attachment'
+// import Attachment from 'components/Attachment'
+import gql from 'graphql-tag'
 export default {
   components: {
-    Attachment
+    // Attachment
   },
   props: ['model'],
+  apollo: {
+    sourceByName: {
+      query: gql`query ($model: String!) {
+        sourceByName(name: $model) {
+          label
+          query
+          columns
+        }
+      }`,
+      variables () {
+        return {
+          model: this.$route.params.model + '_edit'
+        }
+      },
+      update (data) {
+        if (data.sourceByName !== null) {
+          this.query = data.sourceByName.query
+          this.title = data.sourceByName.label
+          if (data.sourceByName.columns) {
+            this.fields = data.sourceByName.columns
+          } else {
+            this.fields = undefined
+          }
+          this.$nextTick(() => { this.$apollo.queries.data.skip = false })
+        } else {
+          this.$q.notify({
+            color: 'negative',
+            position: 'top',
+            message: `Wystąpił błąd przy ładowaniu definicji elementu ${this.$route.params.model}!`,
+            caption: 'Nie znaleziono elementu.',
+            icon: 'report_problem'
+          })
+        }
+        return data
+      },
+      error (error) {
+        this.$q.notify({
+          color: 'negative',
+          position: 'top',
+          message: `Wystąpił błąd przy ładowaniu definicji elementu ${this.$route.params.model}!`,
+          caption: error.toString(),
+          icon: 'report_problem'
+        })
+      }
+    },
+    data: {
+      query () {
+        return gql`query ($id: ID!) {data: ${this.query}}`
+      },
+      variables () {
+        return {
+          id: this.id
+        }
+      },
+      update (data) {
+        return data.data
+      },
+      error (error) {
+        this.$q.notify({
+          color: 'negative',
+          position: 'top',
+          message: `Wystąpił błąd przy ładowaniu elementu ${this.$route.params.model}!`,
+          caption: error.toString(),
+          icon: 'report_problem'
+        })
+      },
+      skip () {
+        return this.skipQuery
+      }
+    }
+  },
   data () {
     return {
-      title: '',
-      id: 'null',
       data: {},
+      title: '',
+      id: undefined,
       fields: [],
       upload_url: ''
     }
   },
   methods: {
-    fType (text) {
-      var map = {
-        Date: 'date',
-        Integer: 'number',
-        Boolean: 'boolean'
-      }
-      if (map[text]) {
-        return map[text]
-      } else {
-        return 'text'
-      }
-    },
-    loadInfoCallback (data) {
-      this.title = data.edit_title
-      for (const col in data.edit_columns) {
-        if (data.add_columns[col].name !== 'app') {
-          this.fields.push({
-            label: data.edit_columns[col].required ? data.edit_columns[col].label + ' *' : data.edit_columns[col].label,
-            field: data.edit_columns[col].name,
-            required: data.edit_columns[col].required,
-            type: this.fType(data.edit_columns[col].type)
-          })
-        }
-      }
-    },
-    loadInfoNewCallback (data) {
-      this.title = data.add_title
-      for (const col in data.add_columns) {
-        if (data.add_columns[col].name !== 'app') {
-          this.fields.push({
-            label: data.add_columns[col].required ? data.add_columns[col].label + ' *' : data.add_columns[col].label,
-            field: data.add_columns[col].name,
-            required: data.add_columns[col].required,
-            type: this.fType(data.add_columns[col].type)
-          })
-        }
-      }
-    },
-    loadDataCallback () {
-    },
-    closeCallback () {
-      this.$emit('loadData')
-      this.$emit('openPopup', false)
-    },
     loadForm (id) {
       this.id = id
-      this.loading = true
-      if (id !== '0') {
-        axiosGet(this, `${this.model} info`, null, `${this.model}/_info`, this.loadInfoCallback, this.closeCallback)
-        axiosGet(this, `${this.model}`, 'data', `${this.model}/${id}`, this.loadDataCallback, this.closeCallback)
-      } else {
-        axiosGet(this, `${this.model} info`, null, `${this.model}/_info`, this.loadInfoNewCallback, this.closeCallback)
-      }
     },
     remove () {
-      axiosDelete(this, `${this.model}`, `${this.model}/${this.id}`, this.closeCallback)
+
     },
     onSubmit () {
-      this.loading = true
-      delete this.data.zalacznik_
-      if (this.id !== '0') {
-        axiosPut(this, `${this.model}`, this.data, `${this.model}/${this.id}`, this.closeCallback)
-      } else {
-        axiosPost(this, `${this.model}`, this.data, `${this.model}/`, this.closeCallback)
-      }
+
+    },
+    editRow () {
+
     },
     onReset () {
     }

@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Table ref="table" :model="this.$route.params.id" v-on:openPopup="openPopup" v-on:editRow="editRow" />
+    <Table ref="table" v-on:openPopup="openPopup" v-on:editRow="editRow" />
     <q-dialog v-model="popup" persistent>
-      <Form ref="form" :model="this.$route.params.id" v-on:openPopup="openPopup" v-on:loadData="loadData" />
+      <Form ref="form" v-on:openPopup="openPopup" v-on:loadData="loadData" />
     </q-dialog>
   </div>
 </template>

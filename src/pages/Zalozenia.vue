@@ -1,15 +1,15 @@
 <template>
-  <div class="q-pa-md q-gutter-sm">
-    <q-btn style="width: 250px" glossy stack color="grey" icon="help" label="Problemy do rozwiązania" @click="showMarkdown('problemy')" />
-    <q-btn style="width: 250px" glossy stack color="grey" icon="trending_up" label="Cel" @click="showMarkdown('cel')" /><br/>
-    <q-btn style="width: 250px" glossy stack color="grey" icon="subject" label="Wymagania" @click="showMarkdown('wymagania')" />
-    <q-btn style="width: 250px" glossy stack color="grey" icon="description" label="Opis projektu" @click="showMarkdown('opis')" /><br/>
-    <q-btn style="width: 250px" glossy stack color="grey" icon="report" label="Zagrożenia" @click="showMarkdown('zagrożenia')" />
-    <q-btn style="width: 250px" glossy stack color="grey" icon="emoji_flags" label="Kamienie milowe" @click="showMarkdown('kamienie')" /><br/>
-    <q-btn style="width: 250px" glossy stack color="grey" icon="attach_money" label="Budżet" @click="showMarkdown('budżet')" />
-    <q-btn style="width: 250px" glossy stack color="grey" icon="fact_check" label="Kryteria akceptacji" @click="showMarkdown('kryteria')" /><br/>
-    <q-btn style="width: 250px" glossy stack color="grey" icon="supervisor_account" label="Biuro projektu" @click="showMarkdown('biuro')" />
-    <q-btn style="width: 250px" glossy stack color="grey" icon="group_work" label="Zespół wdrożeniowy" @click="showMarkdown('zespół')" />
+  <div class="q-pa-md q-gutter-sm" align="center">
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="help" label="Problemy do rozwiązania" @click="showMarkdown('problemy')" />
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="trending_up" label="Cel" @click="showMarkdown('cel')" /><br/>
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="subject" label="Wymagania" @click="showMarkdown('wymagania')" />
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="description" label="Opis projektu" @click="showMarkdown('opis')" /><br/>
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="report" label="Zagrożenia" @click="showMarkdown('zagrożenia')" />
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="emoji_flags" label="Kamienie milowe" @click="showMarkdown('kamienie')" /><br/>
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="attach_money" label="Budżet" @click="showMarkdown('budżet')" />
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="fact_check" label="Kryteria akceptacji" @click="showMarkdown('kryteria')" /><br/>
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="supervisor_account" label="Biuro projektu" @click="showMarkdown('biuro')" />
+    <q-btn style="width: 450px" glossy stack color="grey" size="xl" icon="group_work" label="Zespół wdrożeniowy" @click="showMarkdown('zespół')" />
     <q-dialog v-model="popup">
       <q-card class="col-3">
         <q-card-section class="row items-center q-pb-none">

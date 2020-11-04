@@ -11,8 +11,6 @@ if (process.env.DEV) {
   Vue.prototype.api_link = '/api/v1'
 }
 
-// Vue.prototype.$app = 'Metalwit'
-
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;

@@ -56,9 +56,6 @@ export default {
       this.filter = ''
       this.$refs.filter.focus()
     },
-    nodeClick (obj) {
-      console.log(obj)
-    },
     menuClick (obj) {
       if (this.selected !== '' && this.selected !== null) {
         var link = this.$refs.tree.getNodeByKey(this.selected).link
@@ -71,7 +68,6 @@ export default {
       this.$axios.get(`${this.api_link}/menu1/`)
         .then((response) => {
           this.menu = response.data.data
-          console.log(this.menu)
         })
     }
   }

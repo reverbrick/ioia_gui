@@ -13,30 +13,30 @@
       <template v-slot:body="props">
         <q-tr :props="props">
           <q-td auto-width>
-            <q-checkbox v-model="props.row.gotowe" @input="toggleRow(props.key)" />
+            <q-checkbox :disable="locked" v-model="props.row.gotowe" @input="toggleRow(props.key)" />
           </q-td>
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             {{ col.value }}
           </q-td>
           <q-td auto-width>
-            <q-btn size="sm" color="green" round dense @click="editRow(props.key)" icon="edit" />
-            <q-btn size="sm" color="red" round dense @click="removeRow(props.key)" icon="remove" />
+            <q-btn size="sm" color="green" round dense @click="editRow(props.key)" icon="edit" :disable="locked" />
+            <q-btn size="sm" color="red" round dense @click="removeRow(props.key)" icon="remove" :disable="locked" />
           </q-td>
         </q-tr>
       </template>
       <template v-slot:no-data="">
         <q-space />
-        <q-btn dense color="primary" :disable="loading" label="Dodaj zadanie" @click="addRow" />
+        <q-btn dense color="primary" label="Dodaj zadanie" @click="addRow" :disable="locked" />
       </template>
       <template v-slot:bottom>
         <q-space />
-        <q-btn dense color="primary" :disable="loading" label="Dodaj zadanie" @click="addRow" />
+        <q-btn dense color="primary" label="Dodaj zadanie" @click="addRow" :disable="locked" />
       </template>
     </q-table>
     <q-dialog v-model="popup" persistent>
       <q-card>
         <q-card-section>
-          <div class="text-h6">Pozycja zamówienia ({{form_data.id}})</div>
+          <div class="text-h6">Zadanie ({{form_data.id}})</div>
         </q-card-section>
         <q-form class="q-gutter-md">
           <q-card-section class="q-pt-none">
@@ -76,7 +76,8 @@ export default {
       },
       form_data: {},
       popup: false,
-      loading: false
+      loading: false,
+      locked: true
     }
   },
   mounted: function () {
@@ -85,6 +86,11 @@ export default {
   watch: {
     $route: {
       handler: function () {
+        if (this.$route.params.id === 'Metalwit' && this.$parent.$parent.$parent.$refs.branding.app !== 'Metalwit') {
+          this.locked = true
+        } else {
+          this.locked = false
+        }
         this.loadData()
       },
       deep: true,

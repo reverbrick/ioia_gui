@@ -31,7 +31,7 @@ export default {
   data () {
     return {
       app: '',
-      deadline: '2020-12-25 00:00:00',
+      deadline: '2021-05-01 00:00:00',
       labels: {
         days: 'Dni',
         hours: 'Godzin',

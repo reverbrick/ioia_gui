@@ -29,7 +29,7 @@ export default {
     menus: {
       query: gql`
         query {
-          menus(filter: {parent: {isNull: true}}) {
+          menus(filter: {parent: {isNull: true}}, orderBy: [WEIGHT_ASC]) {
             nodes {
               nodeId
               name

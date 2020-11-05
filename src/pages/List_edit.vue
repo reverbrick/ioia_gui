@@ -27,11 +27,11 @@ export default {
       this.popup = val
     },
     loadData () {
-      this.$nextTick(() => { this.$refs.table.loadData() })
+      // this.$nextTick(() => { this.$refs.table.loadData() })
     },
     editRow (val) {
-      this.popup = true
-      this.$nextTick(() => { this.$refs.form.loadForm(val) })
+      // this.popup = true
+      // this.$nextTick(() => { this.$refs.form.loadForm(val) })
     }
   }
 }

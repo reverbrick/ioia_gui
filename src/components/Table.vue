@@ -1,15 +1,17 @@
 <template>
   <div class="q-pa-md">
     <q-table
-      @request="loadData"
+      @request="onRequest"
       @row-click="editRow"
-      :title="label"
-      :columns="columns"
+      :title="defs.label"
+      :columns="defs.columns"
       :data="rows"
       :loading="this.$apollo.queries.rows.loading"
-      :pagination.sync="pagination" :rows-per-page-options="[0]"
       row-key="nodeId"
-      dense virtual-scroll style="height: 400px">
+      separator="cell"
+      :pagination.sync="pagination"
+      :rows-per-page-options="[0]"
+      dense style="height: 400px">
       <template v-slot:top-right>
         <q-btn-group>
           <q-btn glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="openPopup(true)" />
@@ -50,13 +52,13 @@
 
 <script>
 import gql from 'graphql-tag'
+
 export default {
   apollo: {
-    sourceByName: {
+    defs: {
       query: gql`query ($model: String!) {
-        sourceByName(name: $model) {
+        defs: sourceByName(name: $model) {
           label
-          query
           columns
         }
       }`,
@@ -66,16 +68,17 @@ export default {
         }
       },
       update (data) {
-        if (data.sourceByName !== null) {
-          // this.query = data.sourceByName.query
-          this.label = data.sourceByName.label
-          this.columns = data.sourceByName.columns
-          var columns = ''
-          this.columns.forEach(function (col) {
-            columns = columns + ` ${col.field}`
-          })
-          this.query = `${this.$route.params.model} {nodes {nodeId${columns}}}`
-          this.$nextTick(() => { this.$apollo.queries.rows.skip = false })
+        if (data.defs !== null) {
+          if (data.defs.columns) {
+            var columns = ''
+            data.defs.columns.forEach(function (col) {
+              columns = columns + ` ${col.field}`
+            })
+            this.query = `${this.$route.params.model}s(first:${this.pagination.rowsPerPage}, offset: $offset) {nodes {nodeId${columns}} totalCount}`
+            this.$nextTick(() => { this.$apollo.queries.rows.skip = false })
+          } else {
+            data.defs.columns = []
+          }
         } else {
           this.$q.notify({
             color: 'negative',
@@ -85,7 +88,7 @@ export default {
             icon: 'report_problem'
           })
         }
-        return data
+        return data.defs
       },
       error (error) {
         this.$q.notify({
@@ -99,9 +102,15 @@ export default {
     },
     rows: {
       query () {
-        return gql`query {rows: ${this.query}}`
+        return gql`query ($offset: Int!) {rows: ${this.query}}`
+      },
+      variables () {
+        return {
+          offset: this.pagination.offset
+        }
       },
       update (data) {
+        this.pagination.rowsNumber = data.rows.totalCount
         return data.rows.nodes
       },
       error (error) {
@@ -120,37 +129,36 @@ export default {
   },
   data () {
     return {
+      totalCount: 0,
+      defs: {},
       query: '',
-      label: '',
       filter: '',
-      columns: [],
       filters: [],
       pagination: {
-        rowsPerPage: 0
+        offset: 0,
+        first: 10,
+        rowsPerPage: 20,
+        rowsNumber: 0
       }
     }
   },
   methods: {
-    loadData (props) {
-      console.log(props)
-      /*
-      if (typeof props !== 'undefined') {
-        this.pagination = props.pagination
-      }
-      var q = ''
-      var dir = 'asc'
-      if (this.pagination.descending) {
-        dir = 'desc'
-      }
-      if (this.pagination.sortBy) {
-        q = `?q=(order_column:${this.pagination.sortBy},order_direction:${dir})`
-      }
-      axiosGet(this, this.model, 'data', `${this.model}/${q}`, this.loadCallback)
-      */
+    onRequest (props) {
+      const { page, rowsPerPage, sortBy, descending } = props.pagination
+      this.loading = true
+      const fetchCount = rowsPerPage === 0 ? this.pagination.rowsNumber : rowsPerPage
+      const startRow = (page - 1) * rowsPerPage
+      this.pagination.first = fetchCount
+      this.pagination.offset = startRow
+      this.$apollo.queries.rows.refetch()
+      this.pagination.page = page
+      this.pagination.rowsPerPage = rowsPerPage
+      this.pagination.sortBy = sortBy
+      this.pagination.descending = descending
+      this.loading = false
     },
-    openPopup (val) {
-      // this.$emit('openPopup', val)
-      // this.$emit('editRow', '0')
+    loadData () {
+      this.$apollo.queries.rows.refetch()
     },
     editRow (evt, row, index) {
       this.$emit('editRow', row.nodeId)
@@ -163,10 +171,6 @@ export default {
     },
     resetSearch () {
       this.filter = ''
-      this.loadData({
-        pagination: this.pagination,
-        filter: ''
-      })
       this.$refs.search.focus()
     }
   }

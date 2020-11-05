@@ -1,7 +1,7 @@
 <template>
   <q-card>
     <q-card-section>
-      <div class="text-h6">{{ title }}</div>
+      <div class="text-h6">{{defs.label}}</div>
     </q-card-section>
     <q-form autofocus @submit="onSubmit" @reset="onReset" class="q-gutter-md">
       <q-card-section class="q-pt-none q-gutter-md">
@@ -29,29 +29,29 @@ export default {
   },
   props: ['model'],
   apollo: {
-    sourceByName: {
+    defs: {
       query: gql`query ($model: String!) {
-        sourceByName(name: $model) {
+        defs: sourceByName(name: $model) {
           label
-          query
-          columns
+          fields
         }
       }`,
       variables () {
         return {
-          model: this.$route.params.model + '_edit'
+          model: this.$route.params.model
         }
       },
       update (data) {
-        if (data.sourceByName !== null) {
-          this.query = data.sourceByName.query
-          this.title = data.sourceByName.label
-          if (data.sourceByName.columns) {
-            this.fields = data.sourceByName.columns
-          } else {
-            this.fields = undefined
+        if (data.defs !== null) {
+          if (data.defs.fields) {
+            this.fields = data.defs.fields
+            var fields = ''
+            data.defs.fields.forEach(function (col) {
+              fields = fields + ` ${col.field}`
+            })
+            this.query = `${this.$route.params.model}ByNodeId(nodeId: $id) {${fields}}`
+            this.$nextTick(() => { this.$apollo.queries.data.skip = false })
           }
-          this.$nextTick(() => { this.$apollo.queries.data.skip = false })
         } else {
           this.$q.notify({
             color: 'negative',
@@ -61,7 +61,7 @@ export default {
             icon: 'report_problem'
           })
         }
-        return data
+        return data.defs
       },
       error (error) {
         this.$q.notify({
@@ -101,8 +101,9 @@ export default {
   },
   data () {
     return {
+      defs: {},
       data: {},
-      title: '',
+      query: '',
       id: undefined,
       fields: [],
       upload_url: ''
@@ -116,7 +117,35 @@ export default {
 
     },
     onSubmit () {
-
+      var model = `${this.$route.params.model}`
+      model = model[0].toUpperCase() + model.substr(1) // first char to upper
+      var cols = ''
+      var data = JSON.parse(JSON.stringify(this.data))
+      this.fields.forEach(function (col) {
+        if (col.type === 'boolean' | col.type === 'int') {
+          cols = cols + `${col.field}: ${data[col.field]} `
+        } else {
+          cols = cols + `${col.field}: "${data[col.field]}" `
+        }
+      })
+      var patch = `update${model}ByNodeId (input: {nodeId: $id, patch: {${cols}}}){clientMutationId}`
+      this.$apollo.mutate({
+        mutation: gql`mutation ($id: ID!) {${patch}}`,
+        variables: {
+          id: this.id
+        }
+      }).then(() => {
+        this.$emit('loadData')
+        this.$emit('openPopup', false)
+      }).catch((error) => {
+        this.$q.notify({
+          color: 'negative',
+          position: 'top',
+          message: `Wystąpił błąd przy zapisywaniu elementu ${this.$route.params.model}!`,
+          caption: error.toString(),
+          icon: 'report_problem'
+        })
+      })
     },
     editRow () {
 

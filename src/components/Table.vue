@@ -67,13 +67,14 @@ export default {
       },
       update (data) {
         if (data.sourceByName !== null) {
-          this.query = data.sourceByName.query
+          // this.query = data.sourceByName.query
           this.label = data.sourceByName.label
-          if (data.sourceByName.columns) {
-            this.columns = data.sourceByName.columns
-          } else {
-            this.columns = undefined
-          }
+          this.columns = data.sourceByName.columns
+          var columns = ''
+          this.columns.forEach(function (col) {
+            columns = columns + ` ${col.field}`
+          })
+          this.query = `${this.$route.params.model} {nodes {nodeId${columns}}}`
           this.$nextTick(() => { this.$apollo.queries.rows.skip = false })
         } else {
           this.$q.notify({

@@ -11,10 +11,10 @@
       separator="cell"
       :pagination.sync="pagination"
       :rows-per-page-options="[0]"
-      dense style="height: 400px">
+      dense style="height: 103vh">
       <template v-slot:top-right>
         <q-btn-group>
-          <q-btn glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="openPopup(true)" />
+          <q-btn v-if="$route.meta.title=='Edycja'" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
           <q-input class="q-ml-sm" dense debounce="300" ref="search" v-model="filter" placeholder="Szukaj" v-on:change.prevent="loadData()">
             <template v-slot:append>
               <q-icon v-if="filter !== ''" name="clear" class="cursor-pointer" @click="resetSearch" />
@@ -39,8 +39,11 @@
         </q-btn-group>
       </template>
       <template v-slot:body-cell="props">
-        <q-td v-if="props.value=='#check#'" :props="props">
-          <q-icon name="check_circle" color="green" style="font-size: 20px;" />
+        <q-td v-if="props.col.type=='check'" :props="props">
+          <q-icon v-if="props.value==true" name="check_circle" color="green" style="font-size: 20px;" />
+        </q-td>
+        <q-td v-else-if="props.col.type=='icon'" :props="props">
+          <q-icon v-if="props.value!=null" :name="props.value" style="font-size: 20px;" />
         </q-td>
         <q-td v-else :props="props">
           {{props.value}}
@@ -52,7 +55,7 @@
 
 <script>
 import gql from 'graphql-tag'
-
+import { apolloTableDefsUpdate } from '../boot/ioia.js'
 export default {
   apollo: {
     defs: {
@@ -68,36 +71,11 @@ export default {
         }
       },
       update (data) {
-        if (data.defs !== null) {
-          if (data.defs.columns) {
-            var columns = ''
-            data.defs.columns.forEach(function (col) {
-              columns = columns + ` ${col.field}`
-            })
-            this.query = `${this.$route.params.model}s(first:${this.pagination.rowsPerPage}, offset: $offset) {nodes {nodeId${columns}} totalCount}`
-            this.$nextTick(() => { this.$apollo.queries.rows.skip = false })
-          } else {
-            data.defs.columns = []
-          }
-        } else {
-          this.$q.notify({
-            color: 'negative',
-            position: 'top',
-            message: `Wystąpił błąd przy ładowaniu definicji elementu ${this.$route.params.model}!`,
-            caption: 'Nie znaleziono elementu.',
-            icon: 'report_problem'
-          })
-        }
-        return data.defs
+        return apolloTableDefsUpdate(this, data)
       },
       error (error) {
-        this.$q.notify({
-          color: 'negative',
-          position: 'top',
-          message: `Wystąpił błąd przy ładowaniu definicji elementu ${this.$route.params.model}!`,
-          caption: error.toString(),
-          icon: 'report_problem'
-        })
+        this.alert = true
+        this.error = error
       }
     },
     rows: {
@@ -106,21 +84,18 @@ export default {
       },
       variables () {
         return {
-          offset: this.pagination.offset
+          offset: this.pagination.offset,
+          order: '[]'
         }
       },
+      errorPolicy: 'all',
       update (data) {
         this.pagination.rowsNumber = data.rows.totalCount
         return data.rows.nodes
       },
       error (error) {
-        this.$q.notify({
-          color: 'negative',
-          position: 'top',
-          message: `Wystąpił błąd przy ładowaniu elementu ${this.$route.params.model}!`,
-          caption: error.toString(),
-          icon: 'report_problem'
-        })
+        this.alert = true
+        this.error = error
       },
       skip () {
         return this.skipQuery
@@ -134,10 +109,12 @@ export default {
       query: '',
       filter: '',
       filters: [],
+      order: '[]',
+      columns: '',
       pagination: {
         offset: 0,
         first: 10,
-        rowsPerPage: 20,
+        rowsPerPage: 50,
         rowsNumber: 0
       }
     }
@@ -148,9 +125,19 @@ export default {
       this.loading = true
       const fetchCount = rowsPerPage === 0 ? this.pagination.rowsNumber : rowsPerPage
       const startRow = (page - 1) * rowsPerPage
+      if (sortBy !== null) {
+        if (descending) {
+          this.order = `[${sortBy}_DESC]`
+        } else {
+          this.order = `[${sortBy}_ASC]`
+        }
+      } else {
+        this.order = '[]'
+      }
+      this.query = `${this.$route.params.model}s(first:${this.pagination.rowsPerPage}, offset: $offset, orderBy: ${this.order}) {nodes {nodeId${this.columns}} totalCount}`
+      this.$apollo.queries.rows.refetch()
       this.pagination.first = fetchCount
       this.pagination.offset = startRow
-      this.$apollo.queries.rows.refetch()
       this.pagination.page = page
       this.pagination.rowsPerPage = rowsPerPage
       this.pagination.sortBy = sortBy
@@ -161,7 +148,11 @@ export default {
       this.$apollo.queries.rows.refetch()
     },
     editRow (evt, row, index) {
-      this.$emit('editRow', row.nodeId)
+      if (index !== undefined) {
+        this.$emit('editRow', row.nodeId) // existing
+      } else {
+        this.$emit('editRow', undefined) // new
+      }
     },
     csv () {
       this.$q.notify({

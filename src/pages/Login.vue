@@ -55,7 +55,8 @@ export default {
       }).then((data) => {
         this.loading = false
         localStorage.setItem('token', data.data.authenticate.jwtToken)
-        this.$router.push('/')
+        window.location.href = '/'
+        // this.$router.push('/')
       }).catch((error) => {
         this.$q.notify({
           color: 'negative',

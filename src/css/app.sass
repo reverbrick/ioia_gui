@@ -1,1 +1,14 @@
 // app global css in Sass form
+.sticky-header
+  height: 103vh
+  .q-table__top,
+  .q-table__bottom,
+  thead tr:first-child th
+    background-color: #f5f5f5
+  thead tr th
+    position: sticky
+    z-index: 1
+  thead tr:first-child th
+    top: 0
+  &.q-table--loading thead tr:last-child th
+    top: 48px

@@ -22,6 +22,23 @@ function apolloFormDefsUpdate (that, data) {
         that.query = `${that.$route.params.model}ByNodeId(nodeId: $id) {${fields}}`
         that.$nextTick(() => { that.$apollo.queries.data.skip = false })
       }
+      // populate options for Select
+      data.defs.fields.forEach(function (col) {
+        if (col.type === 'select' && that.options[col.model] === undefined) { // only once
+          that.options[col.model] = []
+          that.$apollo.addSmartQuery(col.model, {
+            query: gql`query { options: ${col.model} {nodes {id name}}}`,
+            update (data) {
+              data.options.nodes.forEach(function (opt) {
+                that.options[col.model].push({ label: opt.name, value: opt.id })
+              })
+            },
+            error (error) {
+              apolloError(this, error)
+            }
+          })
+        }
+      })
     }
   } else {
     showError(`Wystąpił błąd przy ładowaniu definicji elementu ${that.$route.params.model}!`, 'negative', 'Nie znaleziono elementu.')
@@ -35,7 +52,8 @@ function apolloTableDefsUpdate (that, data) {
       that.columns = ''
       that.order = '[]'
       data.defs.columns.forEach(function (col) {
-        that.columns = that.columns + ` ${col.field}`
+        if (col.type === 'related_name') that.columns = that.columns + ` ${col.field} {name}`
+        else that.columns = that.columns + ` ${col.field}`
       })
       that.query = `${that.$route.params.model}s(first:${that.pagination.rowsPerPage}, offset: $offset, orderBy: ${that.order}) {nodes {nodeId${that.columns}} totalCount}`
       that.$nextTick(() => { that.$apollo.queries.rows.skip = false })
@@ -58,7 +76,7 @@ function apolloCreate (that) {
   var cols = ''
   var data = JSON.parse(JSON.stringify(that.data))
   that.fields.forEach(function (col) {
-    if (col.type === 'boolean' | col.type === 'number' | data[col.field] === null) {
+    if (col.type === 'select' | col.type === 'boolean' | col.type === 'number' | data[col.field] === null) {
       cols = cols + `${col.field}: ${data[col.field]} `
     } else {
       cols = cols + `${col.field}: "${data[col.field]}" `
@@ -82,7 +100,7 @@ function apolloUpdate (that) {
   var cols = ''
   var data = JSON.parse(JSON.stringify(that.data))
   that.fields.forEach(function (col) {
-    if (col.type === 'boolean' | col.type === 'number' | data[col.field] === null) {
+    if (col.type === 'select' | col.type === 'boolean' | col.type === 'number' | data[col.field] === null) {
       cols = cols + `${col.field}: ${data[col.field]} `
     } else {
       cols = cols + `${col.field}: "${data[col.field]}" `

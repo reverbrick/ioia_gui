@@ -6,5 +6,6 @@
   },
   "@quasar/apollo": {
     "graphql_uri": "http://localhost/graphql"
-  }
+  },
+  "q-filter-configurator": {}
 }

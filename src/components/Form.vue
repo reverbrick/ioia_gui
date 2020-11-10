@@ -22,6 +22,8 @@
               </q-icon>
             </template>
           </q-input>
+          <!--SELECT-->
+          <q-select dense v-else-if="item.type=='select'" stack-label emit-value map-options :options="options[fields[i].model]" :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
           <!--JSON NODE-->
           <q-select v-else-if="item.type=='json_node'" filled stack-label multiple use-chips use-input hide-dropdown-icon input-debounce="0" @new-value="createJsonNode" @click="clickJsonNode" :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label"/>
           <!--TEXT-->
@@ -109,7 +111,8 @@ export default {
       fields: [],
       upload_url: '',
       alert: false,
-      error: ''
+      error: '',
+      options: {}
     }
   },
   methods: {

@@ -35,6 +35,7 @@ export default function ({ store }) {
 
   Router.beforeEach((to, from, next) => {
     if (!localStorage.getItem('token') && to.path !== '/login' && to.path) next('/login')
+    else if (localStorage.getItem('token') && to.path === '/') next('/grid/schedule')
     else next()
   })
 

@@ -29,7 +29,7 @@ export default {
         cancel: true,
         persistent: true
       }).onOk(() => {
-        // console.log('>>>> OK')
+        this.camera = 'auto'
       }).onOk(() => {
         // console.log('>>>> second OK catcher')
       }).onCancel(() => {

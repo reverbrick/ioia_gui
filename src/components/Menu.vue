@@ -67,16 +67,12 @@ export default {
       }
     },
     filter: function (newVal, oldVal) {
-      if (newVal === 'admin') {
-        location.replace('/users/list/')
-      }
-      if (newVal === 'swagger') {
-        location.replace('/swagger/v1')
-      }
     },
     menus () {
       this.menu = this.formatMenu(this.menus)
-      this.$nextTick(() => { this.$refs.tree.expandAll() })
+      this.$nextTick(() => {
+        this.$refs.tree.expandAll()
+      })
     }
   },
   methods: {
@@ -84,6 +80,7 @@ export default {
       var out = []
       menus.nodes.forEach((value) => {
         var mnu = { id: value.nodeId, name: value.name, label: value.label, link: value.link }
+        if (value.link) mnu.id = value.link // helpful to highlight current link
         if (value.icon) {
           mnu.icon = value.icon
         }

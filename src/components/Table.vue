@@ -15,7 +15,6 @@
       dense>
       <template v-slot:top-right>
         <q-btn-group>
-          <!--
           <q-filter-configurator v-bind="filters_config" v-model="filters">
             <template #slot_filter_select="{ copy, label, multiple, options }">
               <q-item>
@@ -25,7 +24,6 @@
               </q-item>
             </template>
           </q-filter-configurator>
-        -->
           <q-btn v-if="$route.meta.title=='Edycja'" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
           <q-input class="q-ml-sm" dense debounce="300" ref="search" v-model="filter" placeholder="Szukaj" v-on:change.prevent="loadData()">
             <template v-slot:append>
@@ -71,6 +69,7 @@
 <script>
 import gql from 'graphql-tag'
 import { apolloTableDefsUpdate } from '../boot/ioia.js'
+
 export default {
   apollo: {
     defs: {

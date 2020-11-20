@@ -19,37 +19,19 @@
         ref="tree"
       />
     </div>
+    <Error ref="err"/>
   </q-scroll-area>
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import { apolloQuery } from '../boot/ioia.js'
+import Error from 'components/Error'
 export default {
-  apollo: {
-    menus: {
-      query: gql`
-        query {
-          menus(filter: {parent: {isNull: true}}, orderBy: [WEIGHT_ASC]) {
-            nodes {
-              nodeId
-              name
-              label
-              link
-              icon
-              menusByParent {
-                nodes {
-                  nodeId
-                  name
-                  label
-                  link
-                  icon
-                }
-              }
-            }
-          }
-        }
-      `
-    }
+  components: {
+    Error
+  },
+  mounted () {
+    this.loadMenu()
   },
   data () {
     return {
@@ -67,15 +49,46 @@ export default {
       }
     },
     filter: function (newVal, oldVal) {
-    },
-    menus () {
-      this.menu = this.formatMenu(this.menus)
-      this.$nextTick(() => {
-        this.$refs.tree.expandAll()
-      })
     }
   },
   methods: {
+    loadMenu () {
+      apolloQuery(
+        `query {
+            menus(filter: {parent: {isNull: true}}, orderBy: [WEIGHT_ASC]) {
+              nodes {
+                nodeId
+                name
+                label
+                link
+                icon
+                menusByParent(orderBy: [WEIGHT_ASC]) {
+                  nodes {
+                    nodeId
+                    name
+                    label
+                    link
+                    icon
+                  }
+                }
+              }
+            }
+          }`,
+        {},
+        this.menuLoadCallback
+      )
+    },
+    menuLoadCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Menu')
+      } else {
+        data = data.data
+        this.menu = this.formatMenu(data.menus)
+        this.$nextTick(() => {
+          this.$refs.tree.expandAll()
+        })
+      }
+    },
     formatMenu (menus) {
       var out = []
       menus.nodes.forEach((value) => {

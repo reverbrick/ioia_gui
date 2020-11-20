@@ -19,6 +19,7 @@
       :breakpoint="800">
       <Menu/>
       <Branding ref="branding"/>
+      <Error ref="err"/>
     </q-drawer>
     <q-page-container style="height: 111vh">
       <router-view/>
@@ -30,31 +31,30 @@
 import Menu from 'components/Menu'
 import UserMenu from 'components/UserMenu'
 import Branding from 'components/Branding'
-import gql from 'graphql-tag'
+import Error from 'components/Error'
+import { apolloQuery } from '../boot/ioia.js'
 export default {
   name: 'MainLayout',
-  apollo: {
-    currentUser: {
-      query: gql`
-        query {
+  components: {
+    Menu,
+    UserMenu,
+    Branding,
+    Error
+  },
+  mounted () {
+    apolloQuery(
+      `query {
           currentUser {
             lastName
             email
             firstName
           }
+          about
         }
-      `
-    }
-  },
-  components: {
-    Menu,
-    UserMenu,
-    Branding
-  },
-  watch: {
-    currentUser () {
-      this.$refs.usermenu.data = this.currentUser
-    }
+      `,
+      {},
+      this.userLoadCallback
+    )
   },
   data () {
     return {
@@ -64,6 +64,15 @@ export default {
   methods: {
     home () {
       this.$router.push('/')
+    },
+    userLoadCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Dane uźytkownika')
+      } else {
+        data = data.data
+        this.$refs.usermenu.data = data.currentUser
+        this.$refs.branding.about = data.about
+      }
     }
   }
 }

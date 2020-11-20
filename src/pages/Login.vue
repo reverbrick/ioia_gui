@@ -23,14 +23,19 @@
             </q-card>
           </div>
         </div>
+        <Error ref="err"/>
       </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script>
-import gql from 'graphql-tag'
+import { apolloQueryNoBearer } from '../boot/ioia.js'
+import Error from 'components/Error'
 export default {
+  components: {
+    Error
+  },
   name: 'Login',
   data () {
     return {
@@ -41,31 +46,38 @@ export default {
   methods: {
     click () {
       this.loading = true
-      this.$apollo.mutate({
-        // Query
-        mutation: gql`mutation ($user: String!, $password: String!) {
+      apolloQueryNoBearer(
+        `mutation ($user: String!, $password: String!) {
           authenticate(input: {email: $user, password: $password}) {
             jwtToken
           }
         }`,
-        variables: {
+        {
           user: this.user,
           password: this.password
+        },
+        this.loginCallback
+      )
+    },
+    loginCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Login')
+      } else {
+        data = data.data
+        if (data.authenticate.jwtToken == null) {
+          this.$q.notify({
+            color: 'negative',
+            position: 'top',
+            message: 'Login lub hasło niepoprawne!',
+            icon: 'report_problem'
+          })
+          localStorage.setItem('token', '')
+        } else {
+          localStorage.setItem('token', data.authenticate.jwtToken)
+          // this.$router.push('/')
+          window.location.href = '/'
         }
-      }).then((data) => {
-        this.loading = false
-        localStorage.setItem('token', data.data.authenticate.jwtToken)
-        window.location.href = '/'
-        // this.$router.push('/')
-      }).catch((error) => {
-        this.$q.notify({
-          color: 'negative',
-          position: 'top',
-          message: error,
-          icon: 'report_problem'
-        })
-        this.loading = false
-      })
+      }
     }
   }
 }

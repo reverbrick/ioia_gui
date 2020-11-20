@@ -4,8 +4,5 @@
     "import_md": false,
     "import_vmd": false
   },
-  "@quasar/apollo": {
-    "graphql_uri": "http://localhost/graphql"
-  },
   "q-filter-configurator": {}
 }

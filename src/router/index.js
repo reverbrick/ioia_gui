@@ -11,8 +11,6 @@ if (process.env.DEV) {
   Vue.prototype.api_link = '/api/v1'
 }
 
-Vue.prototype.app = 'Rejestracja czasu pracy'
-
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -35,7 +33,7 @@ export default function ({ store }) {
 
   Router.beforeEach((to, from, next) => {
     if (!localStorage.getItem('token') && to.path !== '/login' && to.path) next('/login')
-    else if (localStorage.getItem('token') && to.path === '/') next('/grid/schedule')
+    // else if (localStorage.getItem('token') && to.path === '/' && to.path) next('/grid/holiday')
     else next()
   })
 

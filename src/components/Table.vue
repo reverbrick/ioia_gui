@@ -2,19 +2,23 @@
   <div class="q-pa-md">
     <q-table
       @request="onRequest"
-      @row-click="editRow"
+      @row-dblclick="editRow"
+      @row-click="showDetails"
       :title="defs.label"
       :columns="defs.columns"
       :data="rows"
-      :loading="this.$apollo.queries.rows.loading"
       row-key="nodeId"
       separator="cell"
+      :visible-columns="visible"
       :pagination.sync="pagination"
+      selection="none"
+      :selected.sync="selected"
       :rows-per-page-options="[0]"
-      class="sticky-header"
+      :class="tclass"
       dense>
       <template v-slot:top-right>
         <q-btn-group>
+          <!--
           <q-filter-configurator v-bind="filters_config" v-model="filters">
             <template #slot_filter_select="{ copy, label, multiple, options }">
               <q-item>
@@ -24,6 +28,7 @@
               </q-item>
             </template>
           </q-filter-configurator>
+          -->
           <q-btn v-if="$route.meta.title=='Edycja'" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
           <q-input class="q-ml-sm" dense debounce="300" ref="search" v-model="filter" placeholder="Szukaj" v-on:change.prevent="loadData()">
             <template v-slot:append>
@@ -63,61 +68,37 @@
         </q-td>
       </template>
     </q-table>
+    <Error ref="err"/>
   </div>
 </template>
 
 <script>
-import gql from 'graphql-tag'
-import { apolloTableDefsUpdate } from '../boot/ioia.js'
+import { apolloDefs, apolloQuery } from '../boot/ioia.js'
+import VuePluralize from 'vue-pluralize'
+import Vue from 'vue'
+import Error from 'components/Error'
+
+Vue.use(VuePluralize)
 
 export default {
-  apollo: {
-    defs: {
-      query: gql`query ($model: String!) {
-        defs: sourceByName(name: $model) {
-          label
-          columns
-        }
-      }`,
-      variables () {
-        return {
-          model: this.$route.params.model
-        }
-      },
-      update (data) {
-        return apolloTableDefsUpdate(this, data)
-      },
-      error (error) {
-        this.alert = true
-        this.error = error
-      }
-    },
-    rows: {
-      query () {
-        return gql`query ($offset: Int!) {rows: ${this.query}}`
-      },
-      variables () {
-        return {
-          offset: this.pagination.offset,
-          order: '[]'
-        }
-      },
-      errorPolicy: 'all',
-      update (data) {
-        this.pagination.rowsNumber = data.rows.totalCount
-        return data.rows.nodes
-      },
-      error (error) {
-        this.alert = true
-        this.error = error
-      },
-      skip () {
-        return this.skipQuery
-      }
+  components: {
+    Error
+  },
+  props: {
+    tclass: { default: 'sticky-header' }
+  },
+  mounted () {
+    this.loadData()
+  },
+  watch: {
+    $route: function (newVal) {
+      this.loadData()
     }
   },
   data () {
     return {
+      visible: [],
+      selected: [],
       filters: {},
       filters_config: {
         color: 'blue',
@@ -160,6 +141,7 @@ export default {
       },
       totalCount: 0,
       defs: {},
+      rows: [],
       query: '',
       filter: '',
       // filters: [],
@@ -191,8 +173,14 @@ export default {
       } else {
         this.order = '[]'
       }
-      this.query = `${this.$route.params.model}s(first:${this.pagination.rowsPerPage}, offset: $offset, orderBy: ${this.order}) {nodes {nodeId${this.columns}} totalCount}`
-      this.$apollo.queries.rows.refetch()
+      this.query = `${this.$pluralize(this.$route.params.model)}(first:${this.pagination.rowsPerPage}, offset: $offset, orderBy: ${this.order}) {nodes {nodeId${this.columns}} totalCount}`
+      apolloQuery(
+        `query ($offset: Int!) {rows: ${this.query}}`,
+        {
+          offset: startRow
+        },
+        this.dataUpdateCallback
+      )
       this.pagination.first = fetchCount
       this.pagination.offset = startRow
       this.pagination.page = page
@@ -202,7 +190,51 @@ export default {
       this.loading = false
     },
     loadData () {
-      this.$apollo.queries.rows.refetch()
+      apolloDefs(this.$route.params.model, this.defsUpdateCallback)
+    },
+    defsUpdateCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Tabela')
+      } else {
+        data = data.data
+        this.defs = data.defs
+        if (data.defs.columns) {
+          var columns = ''
+          var visible = []
+          data.defs.columns.forEach(function (col) {
+            if (col.type === 'related_name') columns = columns + ` ${col.field} {name}`
+            else columns = columns + ` ${col.field}`
+            if (!col.hidden) visible.push(col.name)
+          })
+          this.query = `${this.$pluralize(this.$route.params.model)}(first:${this.pagination.rowsPerPage}, offset: $offset, orderBy: ${this.order}) {nodes {nodeId${columns}} totalCount}`
+          this.columns = columns
+          this.visible = visible
+          this.order = '[]'
+          apolloQuery(
+            `query ($offset: Int!) {rows: ${this.query}}`,
+            {
+              offset: this.pagination.offset,
+              order: '[]'
+            },
+            this.dataUpdateCallback
+          )
+        } else {
+          this.defs.columns = []
+        }
+      }
+    },
+    dataUpdateCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Tabela')
+      } else {
+        data = data.data
+        this.rows = data.rows.nodes
+        this.pagination.rowsNumber = data.rows.totalCount
+      }
+    },
+    showDetails (evt, row, index) {
+      this.selected = [row]
+      this.$emit('showDetails', row, this.defs.columns)
     },
     editRow (evt, row, index) {
       if (index !== undefined) {

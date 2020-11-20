@@ -1,9 +1,9 @@
 <template>
   <q-card>
     <q-card-section>
-      <div class="text-h6">{{defs.label}}</div>
+      <div class="text-h6">{{label}}</div>
     </q-card-section>
-    <q-form autofocus @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+    <q-form autofocus @submit="onSubmit" class="q-gutter-md">
       <q-card-section class="q-pt-none q-gutter-md">
         <template v-for="(item, i) in fields">
           <!--BOOLEAN-->
@@ -25,7 +25,9 @@
           <!--SELECT-->
           <q-select dense v-else-if="item.type=='select'" stack-label emit-value map-options :options="options[fields[i].model]" :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
           <!--JSON NODE-->
-          <q-select v-else-if="item.type=='json_node'" filled stack-label multiple use-chips use-input hide-dropdown-icon input-debounce="0" @new-value="createJsonNode" @click="clickJsonNode" :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label"/>
+          <JsonNode v-else-if="item.type=='json_node'" v-bind:key="item.field" :title="item.label" :data="data[fields[i].field]"/>
+          <!--NUMBER-->
+          <q-input dense v-else-if="item.type=='number'" stack-label :required="item.required" v-bind:key="item.field" filled v-model.number="data[fields[i].field]" :label="item.label" :type="item.type"/>
           <!--TEXT-->
           <q-input dense v-else stack-label :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
         </template>
@@ -34,117 +36,114 @@
       <q-card-actions align="right" class="bg-white text-teal">
         <q-btn label="Zapisz" type="submit" color="positive"/>
         <q-btn label="Usuń" @click="remove" color="negative"/>
-        <q-btn label="Anuluj" type="reset" color="primary" v-close-popup />
+        <q-btn label="Anuluj" @click="cancel" color="primary" v-close-popup />
       </q-card-actions>
     </q-form>
-    <q-dialog v-model="alert" persistent transition-show="scale" transition-hide="scale">
-      <q-card class="bg-red text-white" style="width: 300px">
-        <q-card-section>
-          <div class="text-h6">Wystąpił błąd!</div>
-        </q-card-section>
-        <q-card-section class="q-pt-none">
-          {{error}}
-        </q-card-section>
-        <q-card-actions align="right" class="bg-white text-red">
-          <q-btn flat label="OK" v-close-popup />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
+    <Error ref="err"/>
   </q-card>
 </template>
 
 <script>
 // import Attachment from 'components/Attachment'
-import gql from 'graphql-tag'
-import { apolloCreate, apolloUpdate, apolloDelete, apolloFormDefsUpdate, apolloError } from '../boot/ioia.js'
+// import gql from 'graphql-tag'
+import JsonNode from 'components/JsonNode'
+import { apolloCreate, apolloUpdate, apolloDelete, apolloQuery, apolloDefs } from '../boot/ioia.js'
+import Error from 'components/Error'
 export default {
   components: {
     // Attachment
+    JsonNode,
+    Error
   },
   props: ['model'],
-  apollo: {
-    defs: {
-      query: gql`query ($model: String!) {
-        defs: sourceByName(name: $model) {
-          label
-          fields
-        }
-      }`,
-      variables () {
-        return {
-          model: this.$route.params.model
-        }
-      },
-      update (data) {
-        return apolloFormDefsUpdate(this, data)
-      },
-      error (error) {
-        apolloError(this, error)
-      }
-    },
-    data: {
-      query () {
-        return gql`query ($id: ID!) {data: ${this.query}}`
-      },
-      variables () {
-        return {
-          id: this.id
-        }
-      },
-      update (data) {
-        return data.data
-      },
-      error (error) {
-        apolloError(this, error)
-      },
-      skip () {
-        return this.skipQuery
-      }
-    }
-  },
   data () {
     return {
-      defs: {},
       data: {},
-      query: '',
+      label: '',
       id: undefined,
       fields: [],
       upload_url: '',
-      alert: false,
-      error: '',
-      options: {}
+      options: {},
+      componentKey: 0
     }
   },
   methods: {
     loadForm (id) {
       this.id = id
+      apolloDefs(this.$route.params.model, this.defsUpdateCallback)
+    },
+    defsUpdateCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Formularz')
+      } else {
+        data = data.data
+        this.label = data.defs.label
+        if (data.defs !== null) {
+          if (data.defs.fields) {
+            this.fields = data.defs.fields
+            var fields = ''
+            var subquery = ''
+            if (this.id) { // existing
+              data.defs.fields.forEach(function (col) {
+                fields = fields + ` ${col.field}`
+                if (col.type === 'select') subquery = subquery + `${col.model}: ${col.model} {nodes {id name}}`
+              })
+              apolloQuery(
+                `query ($id: ID!) {data: ${this.$route.params.model}ByNodeId(nodeId: $id) {${fields}}${subquery}}`,
+                {
+                  id: this.id
+                },
+                this.dataUpdateCallback
+              )
+            }
+          }
+        }
+      }
+    },
+    dataUpdateCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Formularz')
+      } else {
+        data = data.data
+        this.data = data.data
+        // populate options for Select
+        for (const [key, value] of Object.entries(data)) {
+          if (key !== 'data') {
+            var options = []
+            value.nodes.forEach(function (opt) {
+              options.push({ label: opt.name, value: opt.id })
+            })
+            this.options[key] = options
+          }
+        }
+      }
+    },
+    submitCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Formularz')
+      } else {
+        this.$emit('loadData')
+        this.$emit('openPopup', false)
+      }
     },
     remove () {
-      apolloDelete(this)
+      this.$q.dialog({
+        title: 'Potwierdzenie',
+        message: `Czy na pewno chcesz usunąć element ${this.$route.params.model}?`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        apolloDelete(this.$route.params.model, this.id, this.submitCallback)
+      })
+    },
+    cancel () {
     },
     onSubmit () {
       if (this.id) { // existing
-        apolloUpdate(this)
+        apolloUpdate(this.$route.params.model, this.id, this.data, this.submitCallback)
       } else { // new
-        apolloCreate(this)
+        apolloCreate(this.$route.params.model, this.data, this.submitCallback)
       }
-    },
-    onReset () {
-    },
-    clickJsonNode () {
-      console.log('clickJsonNode')
-    },
-    createJsonNode (val, done) {
-      // specific logic to eventually call done(...) -- or not
-      done(val, 'add-unique')
-
-      // done callback has two optional parameters:
-      //  - the value to be added
-      //  - the behavior (same values of new-value-mode prop,
-      //    and when it is specified it overrides that prop –
-      //    if it is used); default behavior (if not using
-      //    new-value-mode) is to add the value even if it would
-      //    be a duplicate
     }
   }
 }

@@ -15,6 +15,7 @@
       :selected.sync="selected"
       :rows-per-page-options="[0]"
       :class="tclass"
+      :loading="loading"
       dense>
       <template v-slot:top-right>
         <q-btn-group>
@@ -29,7 +30,7 @@
             </template>
           </q-filter-configurator>
           -->
-          <q-btn v-if="$route.meta.title=='Edycja'" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
+          <q-btn v-if="$route.meta.edit" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
           <q-input class="q-ml-sm" dense debounce="300" ref="search" v-model="filter" placeholder="Szukaj" v-on:change.prevent="loadData()">
             <template v-slot:append>
               <q-icon v-if="filter !== ''" name="clear" class="cursor-pointer" @click="resetSearch" />
@@ -152,7 +153,8 @@ export default {
         first: 10,
         rowsPerPage: 50,
         rowsNumber: 0
-      }
+      },
+      loading: true
     }
   },
   methods: {
@@ -190,6 +192,7 @@ export default {
       this.loading = false
     },
     loadData () {
+      this.loading = true
       apolloDefs(this.$route.params.model, this.defsUpdateCallback)
     },
     defsUpdateCallback (data) {
@@ -198,6 +201,10 @@ export default {
       } else {
         data = data.data
         this.defs = data.defs
+        this.$root.$children[0].$children[0].breadcrumbs = [
+          { label: 'Strona główna', icon: 'home', to: '/' },
+          { label: data.defs.label, icon: undefined, click: '' }
+        ]
         if (data.defs.columns) {
           var columns = ''
           var visible = []
@@ -231,6 +238,7 @@ export default {
         this.rows = data.rows.nodes
         this.pagination.rowsNumber = data.rows.totalCount
       }
+      this.loading = false
     },
     showDetails (evt, row, index) {
       this.selected = [row]

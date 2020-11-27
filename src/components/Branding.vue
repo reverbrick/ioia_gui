@@ -3,7 +3,7 @@
     <q-img class="absolute-top glossy" style="height: 170px; background: black;">
       <div class="absolute-middle bg-transparent" >
         <img src="~assets/logo.png">
-        <div class="text-weight-bold" style="color:#ffdc00;">{{$route.params.app ? $route.params.app: this.about}}</div>
+        <div class="text-weight-bold" style="color:#ffdc00;">{{$route.params.app ? $route.params.app: this.title}}</div>
         <div v-if="$route.params.app">Do oddania projektu pozostało:</div>
         <div v-if="$route.params.app" style="zoom: 0.7;">
           <flip-countdown :deadline="deadline" :showSeconds="false" :labels="labels"></flip-countdown>
@@ -30,7 +30,7 @@ export default {
   components: { FlipCountdown },
   data () {
     return {
-      about: '',
+      title: '',
       deadline: '2020-12-25 00:00:00',
       labels: {
         days: 'Dni',

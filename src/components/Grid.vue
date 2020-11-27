@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <q-table
-      :title="$route.meta.title"
+      :title="title"
       :columns="columns"
       :data="rows"
       separator="cell"
@@ -9,9 +9,10 @@
       :pagination="pagination"
       wrap-cells
       class="sticky-header"
-      :loading="loading"
       virtual-scroll
       style="height: 103vh"
+      selection="multiple"
+      :selected.sync="selected"
       row-key="id"
       dense>
       <template v-slot:top-right>
@@ -27,13 +28,17 @@
         </q-input>
       </template>
       <template v-slot:body-cell="props">
-        <q-td v-if="props.col.type=='day' && props.value" :props="props">
-          <q-btn :color="props.value.typ" style="width:100px; height:70px;" no-caps>
+        <q-td v-if="props.col.type=='day' && props.value" :props="props" @click="add(props.col.field, props.key)">
+          <q-btn :color="props.value.typ" style="width:100px; height:70px;" no-caps @click="add(props.col.field, props.key)">
+            <q-spinner v-if="props.value.wait==true"
+              color="white"
+              size="2em"
+            />
             {{props.value.val}}
           </q-btn>
         </q-td>
-        <q-td v-else-if="props.col.type=='day'" :props="props" @click="add(props.col.field, props.key)" />
-        <q-td v-else :props="props">
+        <q-td class="cursor-pointer" v-else-if="props.col.type=='day'" :props="props" @click="add(props.col.field, props.key)" />
+        <q-td v-else :props="props" @click="select(props.key)">
           {{props.value}}
         </q-td>
       </template>
@@ -63,17 +68,21 @@ export default {
     Error
   },
   mounted () {
+    this.$q.loading.show()
     this.loadDates()
     this.loadShifts()
-    this.$route.meta.title = titles[this.$route.params.model]
   },
   watch: {
     $route: function (newVal) {
+      this.$q.loading.show()
       this.query = queries[this.$route.params.model]
       this.loadDates()
-      this.$route.meta.title = titles[this.$route.params.model]
     },
     start: function () {
+      this.$q.loading.show()
+      const today = new Date(this.start)
+      const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
+      this.end = date.formatDate(lastDay, 'YYYY/MM/DD')
       this.loadDates()
     }
   },
@@ -82,7 +91,6 @@ export default {
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
     const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
     return {
-      loading: false,
       start: date.formatDate(firstDay, 'YYYY/MM/DD'),
       end: date.formatDate(lastDay, 'YYYY/MM/DD'),
       // query: 'vSchedules (filter: {or: [{date: {greaterThanOrEqualTo: $start, lessThanOrEqualTo: $end}}, {date: {isNull: true}}]}) {nodes {name department val date typ}}',
@@ -93,7 +101,9 @@ export default {
         rowsPerPage: 0
       },
       shift: null,
-      shifts: []
+      shifts: [],
+      selected: [],
+      title: ''
     }
   },
   methods: {
@@ -112,7 +122,6 @@ export default {
         this.$refs.err.display(data.errors, 'Grid')
       } else {
         data = data.data
-        this.loading = true
         var out = {}
         var rows = []
         data.rows.nodes.forEach(function (row) {
@@ -129,12 +138,16 @@ export default {
         Object.keys(out).forEach(function (row) {
           rows.push(out[row])
         })
-        this.loading = false
         this.rows = rows
+        this.title = titles[this.$route.params.model]
+        this.$root.$children[0].$children[0].breadcrumbs = [
+          { label: 'Strona główna', icon: 'home', to: '/' },
+          { label: titles[this.$route.params.model], icon: undefined, click: '' }
+        ]
+        this.$q.loading.hide()
       }
     },
     loadDates () {
-      this.loading = true
       apolloQuery(
         `mutation ($start: Date!)
         {fDates(input: {start: $start}) {
@@ -166,7 +179,6 @@ export default {
           columns.push(out)
         })
         this.columns = columns
-        this.loading = false
         this.loadGrid()
       }
     },
@@ -195,21 +207,40 @@ export default {
         this.shifts = shifts
       }
     },
-    // TODO: REPLACE WITH FUNCTION THAT REPLACES AND/OR REMOVES IF NULL PASSED. FOR NOW WE DO DOUBLE ENTRIES
+    addSchedule (typ, rows, dat, uid) {
+      rows.forEach(function (row) {
+        var found = false
+        if (row.id === uid) {
+          found = true
+          row[dat] = { typ: typ, wait: true }
+        }
+        if (found === false) {
+          rows.push({ typ: typ, wait: true })
+        }
+      })
+      apolloQuery(
+        'mutation ($uid: Int!, $dat: Date!, $shid: Int) {scheduleAdd (input: {uid: $uid, dat: $dat, shid: $shid}){string}}',
+        {
+          uid: uid,
+          dat: dat,
+          shid: this.shift
+        },
+        this.createCallback
+      )
+      return rows
+    },
     add (dat, uid) {
-      if (this.shift) {
-        apolloQuery(
-          'mutation ($data: ScheduleInput!) {createSchedule (input: {schedule: $data}){clientMutationId}}',
-          {
-            data: {
-              userId: uid,
-              date: dat,
-              shiftId: this.shift
-            }
-          },
-          this.createCallback
-        )
+      var typ = 'red'
+      if (this.shift) typ = 'blue'
+      var rows = this.rows
+      if (this.selected.length === 0) { // update clicked
+        rows = this.addSchedule(typ, rows, dat, uid)
+      } else { // update multiple
+        this.selected.forEach((sel) => {
+          rows = this.addSchedule(typ, rows, dat, sel.id)
+        })
       }
+      this.rows = rows
     },
     createCallback (data) {
       if (data.errors) {
@@ -217,6 +248,10 @@ export default {
       } else {
         this.loadGrid()
       }
+    },
+    select (id) {
+      // TODO: select rows on click
+      // console.log(id, this.selected)
     }
   }
 }

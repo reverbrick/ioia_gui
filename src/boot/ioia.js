@@ -3,8 +3,12 @@ import Vue from 'vue'
 
 Vue.use(VuePluralize)
 
-// var backend = 'https://rcp.ioia.io/api'
 var backend = '/api'
+if (process.env.DEV) {
+  // backend = 'https://horuscrm.ioia.io/api'
+  backend = 'https://mrproj2.ioia.io/api'
+  // backend = 'https://rcp.ioia.io/api'
+}
 var token = localStorage.getItem('token')
 
 function apolloQueryNoBearer (query, variables, callback) {
@@ -30,28 +34,35 @@ function apolloQueryNoBearer (query, variables, callback) {
     // .catch((err) => console.error(err))
 }
 
-function apolloQuery (query, variables, callback) {
-  fetch(backend, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      authorization: token ? `Bearer ${token}` : ''
-    },
-    body: JSON.stringify({
-      query,
-      variables: variables
+function apolloQuery (query, variables, callback, cid = 0) {
+  if (cid === 0 | sessionStorage.getItem(cid) === null) {
+    fetch(backend, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        authorization: token ? `Bearer ${token}` : ''
+      },
+      body: JSON.stringify({
+        query,
+        variables: variables
+      })
     })
-  })
-    .then(r => r.json())
-    .then(
-      function (data) {
-        if (callback) {
-          callback(data)
+      .then(r => r.json())
+      .then(
+        function (data) {
+          if (callback) {
+            if (cid !== 0) sessionStorage.setItem(cid, JSON.stringify(data)) // write cache
+            callback(data)
+          }
         }
-      }
-    )
-    // .catch((err) => console.error(err))
+      )
+      // .catch((err) => console.error(err))
+  } else { // cache
+    if (callback) {
+      callback(JSON.parse(sessionStorage.getItem(cid)))
+    }
+  }
 }
 
 function apolloDefs (model, callback) {
@@ -66,7 +77,8 @@ function apolloDefs (model, callback) {
     {
       model: model
     },
-    callback
+    callback,
+    `defs_${model}`
   )
 }
 
@@ -87,6 +99,9 @@ function apolloUpdate (model, id, data, callback) {
   model = model[0].toUpperCase() + model.substr(1) // first char to upper
   data = JSON.parse(JSON.stringify(data))
   delete data.__typename
+  for (const [key, value] of Object.entries(data)) {
+    if (value === '') data[key] = null // fix for empty string ex with date field
+  }
   apolloQuery(
     `mutation ($data: Update${model}ByNodeIdInput!) {update${model}ByNodeId (input: $data){clientMutationId}}`,
     {

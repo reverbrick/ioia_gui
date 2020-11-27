@@ -7,6 +7,11 @@
           <q-icon name="search" />
         </template>
       </q-input>
+      <q-spinner
+        v-if="loading"
+        color="primary"
+        size="3em"
+      />
       <q-tree
         :selected.sync="selected"
         :ticked.sync="ticked"
@@ -17,6 +22,7 @@
         accordion
         @update:selected="menuClick"
         ref="tree"
+        :loading="loading"
       />
     </div>
     <Error ref="err"/>
@@ -39,7 +45,9 @@ export default {
       menu: [],
       selected: this.$router.currentRoute.fullPath,
       ticked: [],
-      expanded: []
+      expanded: [],
+      loading: true,
+      menu_type: 'default'
     }
   },
   watch: {
@@ -49,6 +57,24 @@ export default {
       }
     },
     filter: function (newVal, oldVal) {
+    },
+    menu_type: function (newVal, oldVal) {
+      if (newVal === 'mrproj') {
+        this.loading = true
+        apolloQuery(
+          `query {
+            projects {
+              nodes {
+                nodeId
+                name
+              }
+            }
+          }`,
+          {},
+          this.mrprojLoadCallback,
+          'mrproj'
+        )
+      }
     }
   },
   methods: {
@@ -75,7 +101,8 @@ export default {
             }
           }`,
         {},
-        this.menuLoadCallback
+        this.menuLoadCallback,
+        'menu'
       )
     },
     menuLoadCallback (data) {
@@ -85,9 +112,34 @@ export default {
         data = data.data
         this.menu = this.formatMenu(data.menus)
         this.$nextTick(() => {
-          this.$refs.tree.expandAll()
+          // this.$refs.tree.expandAll()
         })
       }
+      this.loading = false
+    },
+    mrprojLoadCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Menu')
+      } else {
+        data = data.data
+        // get dummy node and remove it
+        var dummy = []
+        var i = 0
+        this.menu.forEach((value) => {
+          if (value.name === 'mrproj') {
+            this.menu.splice(i, 1)
+            dummy = value.children
+          }
+          i++
+        })
+        // add project nodes
+        data.projects.nodes.forEach((value) => {
+          var mnu = { id: value.nodeId, name: value.name, label: value.name, selectable: false }
+          mnu.children = dummy
+          this.menu.push(mnu)
+        })
+      }
+      this.loading = false
     },
     formatMenu (menus) {
       var out = []
@@ -115,6 +167,9 @@ export default {
       if (this.selected !== '' && this.selected !== null) {
         var link = this.$refs.tree.getNodeByKey(this.selected).link
         if (link !== this.$router.currentRoute.fullPath) {
+          this.$root.$children[0].$children[0].breadcrumbs = [
+            { label: 'Strona główna', icon: 'home', to: '/' }
+          ]
           this.$router.push(link)
         }
       }

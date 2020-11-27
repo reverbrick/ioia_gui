@@ -4,8 +4,8 @@
       <q-toolbar class="bg-grey" style="min-height: 42px">
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen" icon="menu" aria-label="Menu"/>
         <q-breadcrumbs active-color="white" style="font-size: 16px">
-          <q-breadcrumbs-el label="Strona główna" icon="home" @click="home"/>
-          <q-breadcrumbs-el :label="$route.meta.title" />
+          <q-breadcrumbs-el v-for="(item, i) in breadcrumbs" v-bind:key="i" :label="item.label" :icon="item.icon" :to="item.to" />
+          <!--<q-breadcrumbs-el :label="$route.meta.title" />-->
         </q-breadcrumbs>
         <q-space />
         <UserMenu ref="usermenu"/>
@@ -17,7 +17,7 @@
       show-if-above
       content-class="bg-grey-1"
       :breakpoint="800">
-      <Menu/>
+      <Menu ref="menu"/>
       <Branding ref="branding"/>
       <Error ref="err"/>
     </q-drawer>
@@ -49,21 +49,30 @@ export default {
             email
             firstName
           }
-          about
+          sources(filter: {name: {equalTo: "about"}}) {
+            nodes {
+              columns
+            }
+          }
         }
       `,
       {},
-      this.userLoadCallback
+      this.userLoadCallback,
+      'userdata'
     )
   },
   data () {
     return {
-      leftDrawerOpen: false
+      leftDrawerOpen: false,
+      breadcrumbs: [
+        { label: 'Strona główna', icon: 'home', to: '/' }
+        // { label: this.$route.meta.title, icon: undefined, click: '' }
+      ]
     }
   },
   methods: {
     home () {
-      this.$router.push('/')
+      if (this.$route.path !== '/') this.$router.push('/')
     },
     userLoadCallback (data) {
       if (data.errors) {
@@ -71,7 +80,14 @@ export default {
       } else {
         data = data.data
         this.$refs.usermenu.data = data.currentUser
-        this.$refs.branding.about = data.about
+        // global app config
+        this.$refs.branding.title = data.sources.nodes[0].columns.title
+        this.$refs.menu.menu_type = data.sources.nodes[0].columns.menu
+        this.$about.home = data.sources.nodes[0].columns.home
+        this.$about.title = data.sources.nodes[0].columns.title
+        this.$about.menu = data.sources.nodes[0].columns.menu
+
+        if (this.$route.path === '/') this.$router.push(data.sources.nodes[0].columns.home)
       }
     }
   }

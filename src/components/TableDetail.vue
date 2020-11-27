@@ -57,6 +57,9 @@ export default {
         if (col.details) out.push({ name: col.label, value: row[col.field] })
       })
       this.rows = out
+    },
+    clearDetails () {
+      this.rows = []
     }
   }
 }

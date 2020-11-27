@@ -11,6 +11,8 @@ if (process.env.DEV) {
   Vue.prototype.api_link = '/api/v1'
 }
 
+Vue.prototype.$about = { title: '', home: '/', menu: 'default' }
+
 /*
  * If not building with SSR mode, you can
  * directly export the Router instantiation;
@@ -33,7 +35,7 @@ export default function ({ store }) {
 
   Router.beforeEach((to, from, next) => {
     if (!localStorage.getItem('token') && to.path !== '/login' && to.path) next('/login')
-    // else if (localStorage.getItem('token') && to.path === '/' && to.path) next('/grid/holiday')
+    else if (localStorage.getItem('token') && to.path === '/' && to.path && Vue.prototype.$about.home !== '/') next(Vue.prototype.$about.home)
     else next()
   })
 

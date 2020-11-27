@@ -51,11 +51,16 @@
 
 <script>
 export default {
-  props: ['data', 'title'],
+  props: ['data', 'title', 'model'],
   watch: {
     data: function (newVal, oldVal) {
       if (newVal) {
         this.json_data = newVal
+      }
+    },
+    json_data: function (newVal, oldVal) {
+      if (newVal) {
+        this.$emit('update-node', this.model, newVal)
       }
     }
   },

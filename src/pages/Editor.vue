@@ -18,42 +18,31 @@
     </q-splitter>
     <q-footer class="bg-white">
       <q-toolbar class="bg-white text-primary q-gutter-sm">
-        <q-btn label="Zapisz" type="submit" color="primary" @click="onSubmit"/>
-        <q-btn label="Usuń" type="submit" color="red" @click="onDelete"/>
-        <q-btn label="Anuluj" type="reset" color="primary" flat class="q-ml-sm" @click="onCancel" />
+        <q-btn label="Zapisz" type="submit" color="positive" @click="onSubmit"/>
+        <q-btn label="Usuń" type="submit" color="negative" @click="onDelete"/>
+        <q-btn label="Anuluj" type="reset" color="primary" @click="onCancel" />
       </q-toolbar>
       <br/>
     </q-footer>
+    <Error ref="err"/>
   </div>
 </template>
 <style src="@quasar/quasar-ui-qmarkdown/dist/index.css"></style>
 <script>
-import gql from 'graphql-tag'
 import { QMarkdown } from '@quasar/quasar-ui-qmarkdown'
+import { apolloQuery, apolloCreate, apolloUpdate, apolloDelete } from '../boot/ioia.js'
+import Error from 'components/Error'
 export default {
   components: {
-    QMarkdown
+    QMarkdown,
+    Error
   },
-  apollo: {
-    content: {
-      query: gql`query ($id: ID!) {
-        content: staticByNodeId(nodeId: $id) {
-          name
-          body
-        }
-      }`,
-      variables () {
-        return {
-          id: this.$route.params.id
-        }
-      },
-      update (data) {
-        return data.content
-      },
-      error (error) {
-        console.log(error)
-      }
-    }
+  mounted () {
+    this.loadForm()
+    this.$root.$children[0].$children[0].breadcrumbs = [
+      { label: 'Strona główna', icon: 'home', to: '/' },
+      { label: 'Edytor', icon: undefined, click: '' }
+    ]
   },
   data () {
     return {
@@ -66,14 +55,55 @@ export default {
     }
   },
   methods: {
+    loadForm () {
+      if (this.$route.params.id !== 'new') {
+        apolloQuery(
+          `query ($id: ID!) {
+            content: staticByNodeId(nodeId: $id) {
+              name
+              body
+            }
+          }`,
+          {
+            id: this.$route.params.id
+          },
+          this.updateCallback
+        )
+      }
+    },
+    updateCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Edytor')
+      } else {
+        this.content = data.data.content
+      }
+    },
+    submitCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Edytor')
+      } else {
+        this.$router.go(-1)
+      }
+    },
     onSubmit () {
+      if (this.$route.params.id !== 'new') { // existing
+        apolloUpdate('static', this.$route.params.id, this.content, this.submitCallback)
+      } else { // new
+        apolloCreate('static', this.content, this.submitCallback)
+      }
     },
     onDelete () {
+      this.$q.dialog({
+        title: 'Potwierdzenie',
+        message: 'Czy na pewno chcesz usunąć element Treść?',
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        apolloDelete('static', this.$route.params.id, this.submitCallback)
+      })
     },
     onCancel () {
-      this.$router.push('/static')
-    },
-    onRejected () {
+      this.$router.go(-1)
     }
   }
 }

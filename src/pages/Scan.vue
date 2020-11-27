@@ -14,6 +14,13 @@ import { QrcodeStream } from 'vue-qrcode-reader'
 export default {
   name: 'PageIndex',
   components: { QrcodeStream },
+  mounted () {
+    // this.$q.loading.show()
+    this.$root.$children[0].$children[0].breadcrumbs = [
+      { label: 'Strona główna', icon: 'home', to: '/' },
+      { label: 'Skanuj QR', icon: undefined, click: '' }
+    ]
+  },
   data () {
     return {
       isValid: undefined,

@@ -18,6 +18,11 @@ export default {
     TableDetail,
     Form
   },
+  watch: {
+    $route: function (newVal) {
+      this.$refs.detail.clearDetails()
+    }
+  },
   data () {
     return {
       popup: false

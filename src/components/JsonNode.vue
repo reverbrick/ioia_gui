@@ -80,7 +80,7 @@ export default {
       ],
       align: ['left', 'right', 'center'],
       bool: [true, false],
-      type: [null, 'text', 'boolean', 'time', 'select', 'email', 'tel', 'json_node', 'related_name'],
+      type: [null, 'text', 'boolean', 'time', 'date', 'select', 'email', 'tel', 'json_node', 'markdown', 'related_name', 'check'],
       pagination: {
         rowsPerPage: 0
       }

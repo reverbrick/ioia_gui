@@ -30,7 +30,8 @@
             </template>
           </q-filter-configurator>
           -->
-          <q-btn v-if="$route.meta.edit" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
+          <q-btn v-if="$route.meta.edit & $route.params.model!='user'" glossy icon="note_add" dense no-caps label="Dodaj" color="primary" @click="editRow" />
+          <q-btn v-if="$route.params.model=='user'" glossy icon="note_add" dense no-caps label="Zarejestruj" color="primary" @click="registerUser" />
           <q-input class="q-ml-sm" dense debounce="300" ref="search" v-model="filter" placeholder="Szukaj" v-on:change.prevent="loadData()">
             <template v-slot:append>
               <q-icon v-if="filter !== ''" name="clear" class="cursor-pointer" @click="resetSearch" />
@@ -61,12 +62,18 @@
         <q-td v-else-if="props.col.type=='related_name'" :props="props">
           {{check_null_name(props.value)}}
         </q-td>
+        <q-td v-else-if="props.col.type=='date'" :props="props">
+          {{date_format(props.value)}}
+        </q-td>
         <q-td v-else-if="props.col.type=='icon'" :props="props">
           <q-icon v-if="props.value!=null" :name="props.value" style="font-size: 20px;" />
         </q-td>
         <q-td v-else :props="props">
           {{props.value}}
         </q-td>
+      </template>
+      <template v-slot:bottom>
+        ID: {{selected[0] ? selected[0].nodeId : 'brak'}}
       </template>
     </q-table>
     <Error ref="err"/>
@@ -78,6 +85,7 @@ import { apolloDefs, apolloQuery } from '../boot/ioia.js'
 import VuePluralize from 'vue-pluralize'
 import Vue from 'vue'
 import Error from 'components/Error'
+import { date } from 'quasar'
 
 Vue.use(VuePluralize)
 
@@ -94,6 +102,7 @@ export default {
   watch: {
     $route: function (newVal) {
       this.loadData()
+      this.selected = []
     }
   },
   data () {
@@ -160,6 +169,9 @@ export default {
   methods: {
     check_null_name (val) {
       if (val) return val.name
+    },
+    date_format (val) {
+      if (val) return date.formatDate(val, 'YYYY-MM-DD')
     },
     onRequest (props) {
       const { page, rowsPerPage, sortBy, descending } = props.pagination
@@ -268,6 +280,9 @@ export default {
         color: this.$q.dark.isActive ? 'dark' : 'primary',
         icon: 'mdi-content-copy'
       })
+    },
+    registerUser () {
+      this.$emit('registerUser')
     }
   }
 }

@@ -5,9 +5,10 @@
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen" icon="menu" aria-label="Menu"/>
         <q-breadcrumbs active-color="white" style="font-size: 16px">
           <q-breadcrumbs-el v-for="(item, i) in breadcrumbs" v-bind:key="i" :label="item.label" :icon="item.icon" :to="item.to" />
-          <!--<q-breadcrumbs-el :label="$route.meta.title" />-->
         </q-breadcrumbs>
         <q-space />
+        <q-btn v-if="$route.params.app" flat dense @click="contact" icon="email" label="Kontakt"/>
+        <q-btn v-if="$route.params.app" flat dense @click="meeting" icon="meeting_room" label="Spotkanie"/>
         <UserMenu ref="usermenu"/>
         <q-btn flat dense round color="white" @click="$q.fullscreen.toggle()" :icon="$q.fullscreen.isActive ? 'fullscreen_exit' : 'fullscreen'"/>
       </q-toolbar>
@@ -73,6 +74,13 @@ export default {
   methods: {
     home () {
       if (this.$route.path !== '/') this.$router.push('/')
+    },
+    contact () {
+      this.$router.push('/Metalwit Robots Projects/static/kontakt')
+    },
+    meeting () {
+      var win = window.open('https://meet.google.com/maq-ueyr-zzn', '_blank')
+      win.focus()
     },
     userLoadCallback (data) {
       if (data.errors) {

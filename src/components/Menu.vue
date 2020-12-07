@@ -81,20 +81,29 @@ export default {
     loadMenu () {
       apolloQuery(
         `query {
-            menus(filter: {parent: {isNull: true}}, orderBy: [WEIGHT_ASC]) {
+            vMenus(filter: {parent: {isNull: true}}, orderBy: [WEIGHT_ASC]) {
               nodes {
                 nodeId
                 name
                 label
                 link
                 icon
-                menusByParent(orderBy: [WEIGHT_ASC]) {
+                vMenusByParent(orderBy: [WEIGHT_ASC]) {
                   nodes {
                     nodeId
                     name
                     label
                     link
                     icon
+                    vMenusByParent(orderBy: [WEIGHT_ASC]) {
+                      nodes {
+                        nodeId
+                        name
+                        label
+                        link
+                        icon
+                      }
+                    }
                   }
                 }
               }
@@ -110,7 +119,7 @@ export default {
         this.$refs.err.display(data.errors, 'Menu')
       } else {
         data = data.data
-        this.menu = this.formatMenu(data.menus)
+        this.menu = this.formatMenu(data.vMenus)
         this.$nextTick(() => {
           // this.$refs.tree.expandAll()
         })
@@ -135,7 +144,11 @@ export default {
         // add project nodes
         data.projects.nodes.forEach((value) => {
           var mnu = { id: value.nodeId, name: value.name, label: value.name, selectable: false }
-          mnu.children = dummy
+          // TODO this is broken
+          mnu.children = JSON.parse(JSON.stringify(dummy))
+          mnu.children.forEach((child) => {
+            child.link = child.link.replace('#proj#', value.name)
+          })
           this.menu.push(mnu)
         })
       }
@@ -152,8 +165,8 @@ export default {
         if (!value.link) {
           mnu.selectable = false
         }
-        if (value.menusByParent) {
-          mnu.children = this.formatMenu(value.menusByParent)
+        if (value.vMenusByParent) {
+          mnu.children = this.formatMenu(value.vMenusByParent)
         }
         out.push(mnu)
       })

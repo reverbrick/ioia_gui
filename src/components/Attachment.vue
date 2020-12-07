@@ -14,35 +14,42 @@
 
 <script>
 export default {
-  props: ['model', 'field', 'id', 'list', 'max', 'label'],
+  props: ['model', 'field', 'id', 'max', 'label'],
   watch: {
-    list: {
-      handler: function () {
-        this.$refs.attachment.files = this.list
-      },
-      deep: true,
-      immediate: false
-    },
     id: {
       handler: function () {
-        this.upload_url = `${this.api_link}/upload/?model=${this.model}&id=${this.id}`
+        this.upload_url = `${this.backend}?model=${this.model}&id=${this.id}`
       },
       deep: true,
       immediate: true
     }
   },
-  populate (list) {
-    console.log(list)
-    this.$refs.attachment.files = list
+  mounted: function () {
+    this.populate(this.thecallback)
   },
   data () {
     return {
-      upload_url: `${this.api_link}/upload/?model=${this.model}&id=${this.id}`
+      upload_url: `${this.backend}?model=${this.model}&id=${this.id}`,
+      backend: 'https://mrproj2.ioia.io/upload/'
     }
   },
   methods: {
     file_remove (obj) {
-      this.$axios.delete(`${this.api_link}/upload/?model=${this.model}&id=${this.id}`, { data: { name: obj[0].name } })
+      this.$axios.delete(`${this.backend}?model=${this.model}&id=${this.id}`, { data: obj[0].name })
+    },
+    populate (callback) {
+      fetch(`${this.backend}?model=${this.model}&id=${this.id}`)
+        .then(response => response.json())
+        .then(
+          function (data) {
+            if (callback) {
+              callback(data)
+            }
+          }
+        )
+    },
+    thecallback (data) {
+      this.$refs.attachment.files = data.files
     }
   }
 }

@@ -6,7 +6,7 @@ Vue.use(VuePluralize)
 var backend = '/api'
 if (process.env.DEV) {
   // backend = 'https://horuscrm.ioia.io/api'
-  backend = 'https://mrproj2.ioia.io/api'
+  backend = 'https://mrproj.ioia.io/api'
   // backend = 'https://rcp.ioia.io/api'
 }
 var token = localStorage.getItem('token')
@@ -96,6 +96,8 @@ function apolloCreate (model, data, callback) {
 }
 
 function apolloUpdate (model, id, data, callback) {
+  if (model === 'menu') sessionStorage.removeItem('menu') // remove cached version of menu
+  if (model === 'source') sessionStorage.clear() // remove all cache
   model = model[0].toUpperCase() + model.substr(1) // first char to upper
   data = JSON.parse(JSON.stringify(data))
   delete data.__typename

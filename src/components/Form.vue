@@ -12,9 +12,9 @@
         />
         <template v-for="(item, i) in fields">
           <!--BOOLEAN-->
-          <q-toggle dense v-if="item.type=='boolean'" stack-label :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
+          <q-toggle dense v-if="item.type=='boolean'" stack-label :rules="item.required ? [selRequired] : []" :hint="item.required ? 'Pole wymagane' : undefined" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
           <!--TIME-->
-          <q-input dense v-else-if="item.type=='time'" filled stack-label :required="item.required" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" mask="time" :rules="['time']">
+          <q-input dense v-else-if="item.type=='time'" filled stack-label :rules="item.required ? [selRequired,time] : [time]" :hint="item.required ? 'Pole wymagane' : undefined" v-bind:key="item.field" v-model="data[fields[i].field]" :label="item.label" mask="time">
             <template v-slot:append>
               <q-icon name="access_time" class="cursor-pointer">
                 <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -28,13 +28,15 @@
             </template>
           </q-input>
           <!--SELECT-->
-          <q-select dense v-else-if="item.type=='select'" stack-label emit-value map-options :options="options[fields[i].model]" :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
+          <q-select dense v-else-if="item.type=='select'" stack-label emit-value map-options :options="options[fields[i].model]" :rules="item.required ? [selRequired] : []" :hint="item.required ? 'Pole wymagane' : undefined" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
           <!--JSON NODE-->
           <JsonNode v-else-if="item.type=='json_node'" v-bind:key="item.field" :title="item.label" :data="data[fields[i].field]" :model="item.field" @update-node="updateNode"/>
           <!--NUMBER-->
-          <q-input dense v-else-if="item.type=='number'" stack-label :required="item.required" v-bind:key="item.field" filled v-model.number="data[fields[i].field]" :label="item.label" :type="item.type"/>
+          <q-input dense v-else-if="item.type=='number'" stack-label :rules="item.required ? [selRequired] : []" :hint="item.required ? 'Pole wymagane' : undefined" v-bind:key="item.field" filled v-model.number="data[fields[i].field]" :label="item.label" :type="item.type"/>
+          <!--MARKDOWN-->
+          <Markdown v-else-if="item.type=='markdown'" v-bind:key="item.field" :title="item.label" :data="data[fields[i].field]" :model="item.field" @update-node="updateNode"/>
           <!--TEXT-->
-          <q-input dense v-else stack-label :required="item.required" v-bind:key="item.field" filled v-model="data[fields[i].field]" :label="item.label" :type="item.type"/>
+          <q-input dense v-else stack-label v-bind:key="item.field" filled v-model="data[fields[i].field]" :rules="item.required ? [selRequired] : []" :hint="item.required ? 'Pole wymagane' : undefined" :label="item.label" :type="item.type"/>
         </template>
         <!--<Attachment v-if="data.zalacznik_" ref="zalacznik" label="Załączniki" max="3" :model="model" :id="id" :list="data.zalacznik" />-->
       </q-card-section>
@@ -52,12 +54,14 @@
 // import Attachment from 'components/Attachment'
 // import gql from 'graphql-tag'
 import JsonNode from 'components/JsonNode'
+import Markdown from 'components/Markdown'
 import { apolloCreate, apolloUpdate, apolloDelete, apolloQuery, apolloDefs } from '../boot/ioia.js'
 import Error from 'components/Error'
 export default {
   components: {
     // Attachment
     JsonNode,
+    Markdown,
     Error
   },
   props: ['model'],
@@ -182,6 +186,11 @@ export default {
     },
     updateNode (model, val) {
       this.data[model] = val
+    },
+    selRequired (val) {
+      if (val === undefined) {
+        return 'Pole jest wymagane!'
+      }
     }
   }
 }

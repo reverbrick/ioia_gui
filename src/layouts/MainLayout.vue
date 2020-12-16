@@ -94,7 +94,6 @@ export default {
         this.$about.home = data.sources.nodes[0].columns.home
         this.$about.title = data.sources.nodes[0].columns.title
         this.$about.menu = data.sources.nodes[0].columns.menu
-
         if (this.$route.path === '/') this.$router.push(data.sources.nodes[0].columns.home)
       }
     }

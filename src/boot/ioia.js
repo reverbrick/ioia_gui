@@ -57,7 +57,17 @@ function apolloQuery (query, variables, callback, cid = 0) {
           }
         }
       )
-      // .catch((err) => console.error(err))
+      .catch(
+        function (err) {
+          sessionStorage.clear()
+          if (callback) {
+            var data = { errors: err }
+            callback(data)
+          } else {
+            alert(`Wystąpiły problemy z zapytaniem: ${err}`)
+          }
+        }
+      )
   } else { // cache
     if (callback) {
       callback(JSON.parse(sessionStorage.getItem(cid)))

@@ -92,12 +92,6 @@ export default {
   watch: {
     $route: {
       handler: function () {
-        if (this.$route.params.id === 'Metalwit' && this.$parent.$parent.$parent.$refs.branding.app !== 'Metalwit') {
-          // this.locked = true
-          this.locked = false
-        } else {
-          this.locked = false
-        }
         this.loadData()
       },
       deep: true,
@@ -163,6 +157,7 @@ export default {
               category
             }
           }
+          currentUserRole
         }`,
         {
           category: this.$route.params.id,
@@ -175,6 +170,11 @@ export default {
       if (data.errors) {
         this.$refs.err.display(data.errors, 'Zadania')
       } else {
+        if (this.$route.params.id === 'Metalwit' && data.data.currentUserRole !== 'app_metalwit') {
+          this.locked = true
+        } else {
+          this.locked = false
+        }
         for (var i = 0; i < data.data.tasks.nodes.length; i++) {
           data.data.tasks.nodes[i].dueDate = this.date_format(data.data.tasks.nodes[i].dueDate)
           data.data.tasks.nodes[i].taskDate = this.date_format(data.data.tasks.nodes[i].taskDate)

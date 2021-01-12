@@ -1,21 +1,21 @@
 <template>
   <q-page class="q-pa-md q-gutter-md">
     <div class="row items-start justify-center q-gutter-md">
-      <q-card v-if="status==1" class="col-3 col-md-3">
+      <q-card v-if="status==1" class="col-4 col-md-4">
         <q-item style="background-color: red" class="q-pa-none">
           <q-item-section avatar>
             <q-icon color="white" name="settings_applications" size="44px"/>
           </q-item-section>
           <q-item-section class="q-pa-md q-ml-none text-white">
             <q-item-label class="text-white text-h6 text-weight-bolder">Wyłączona</q-item-label>
-            <q-item-label>Nie pracuje</q-item-label>
+            <q-item-label>Nie pracuje (ost. {{activity}})</q-item-label>
           </q-item-section>
           <q-item-section side class="q-mr-md text-white">
             <q-icon name="fas fa-dollar-sign" color="white" size="44px"></q-icon>
           </q-item-section>
         </q-item>
       </q-card>
-      <q-card v-else-if="status==2" class="col-3 col-md-3">
+      <q-card v-else-if="status==2" class="col-4 col-md-4">
         <q-item style="background-color: #F2C037" class="q-pa-none">
           <q-item-section avatar>
             <q-icon color="white" name="settings_applications" size="44px"/>
@@ -29,7 +29,7 @@
           </q-item-section>
         </q-item>
       </q-card>
-      <q-card v-else-if="status==3" class="col-3 col-md-3">
+      <q-card v-else-if="status==3" class="col-4 col-md-4">
         <q-item style="background-color: #21BA45" class="q-pa-none">
           <q-item-section avatar>
             <q-icon color="white" name="settings_applications" size="34px"/>
@@ -40,7 +40,7 @@
           </q-item-section>
         </q-item>
       </q-card>
-      <q-card v-else class="col-3 col-md-3">
+      <q-card v-else class="col-4 col-md-4">
         <q-item style="background-color: #C0c0c0" class="q-pa-none">
           <q-item-section avatar>
             <q-icon color="white" name="settings_applications" size="44px"/>
@@ -101,6 +101,11 @@
 
 <script>
 import IEcharts from 'vue-echarts-v3/src/full.js'
+import VueNativeSock from 'vue-native-websocket'
+import Vue from 'vue'
+import { date } from 'quasar'
+
+Vue.use(VueNativeSock, 'wss://red.ioia.io/ws', { format: 'json', reconnection: true })
 
 export default {
   name: 'Dashboard2',
@@ -114,12 +119,12 @@ export default {
   },
   mounted () {
     this.bread()
-    this.roll()
     // this.$q.loading.show()
   },
   data () {
     return {
       status: 0,
+      activity: '',
       pie: ['Wykres1', 'Wykres2', 'Wykres3', 'Wykres4'],
       chart: ['Dzień', 'Miesiąc', 'Rok'],
       option: ['dzien', 'dzien', 'dzien'],
@@ -323,10 +328,27 @@ export default {
     }
   },
   methods: {
+    sockopen () {
+      this.$socket.send('hey')
+    },
+    sock (data) {
+      data = JSON.parse(data.data)
+      if (data.client === this.$route.params.app) {
+        this.status = data.status
+        this.info[0].value = data.worek + ' (' + data.paleta + ' palet)'
+        this.activity = date.formatDate(Date.parse(data.data), 'YYYY-MM-DD HH:mm')
+      }
+      console.log(data)
+    },
     bread () {
       this.$root.$children[0].$children[0].breadcrumbs = [{ label: 'Strona główna', icon: 'home', to: '/' }]
       if (this.$route.params.app) this.$root.$children[0].$children[0].breadcrumbs.push({ label: this.$route.params.app, icon: undefined, click: '' })
       this.$root.$children[0].$children[0].breadcrumbs.push({ label: 'Dashboard', icon: undefined, click: '' })
+      // websocket
+      this.data.status = 0
+      this.$options.sockets.onmessage = (data) => this.sock(data)
+      this.$options.sockets.onopen = (data) => this.sockopen()
+      this.sockopen()
     },
     randomizeFloat (min, max) {
       // return min + (max - min) * Math.random()

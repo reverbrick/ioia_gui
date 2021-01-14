@@ -1354,60 +1354,60 @@
     babel-plugin-dynamic-import-node "^2.3.0"
     babel-plugin-module-resolver "^4.0.0"
 
-"@quasar/extras@^1.9.9":
-  version "1.9.9"
-  resolved "https://registry.yarnpkg.com/@quasar/extras/-/extras-1.9.9.tgz#2578962ee379d2cb947e19f9fc09ac27a663b89f"
-  integrity sha512-VQ87H2oyoLMYowVGq/3pYXnW+TYtQU/WUZTqkrMieOWx4NV9UpxfAG3nLj068w4uawY309Ed95NB6qarzl747g==
+"@quasar/extras@^1.9.13":
+  version "1.9.13"
+  resolved "https://registry.yarnpkg.com/@quasar/extras/-/extras-1.9.13.tgz#7452ff0b47fd0b2b2d10c6ebad6969c5ac7c071b"
+  integrity sha512-9ptRGMjBqfgxzLmH4MOlzSzmkwg7JAkWaB+EqDuZmjHyqkAGjGkuZj2LK4qbJdgveR94mlsJHb5fKojKzGkt0w==
 
 "@quasar/fastclick@1.1.4":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@quasar/fastclick/-/fastclick-1.1.4.tgz#21ed3e9a4387dcb43022a08af4ef08a5f1abf159"
   integrity sha512-i9wbyV4iT+v4KhtHJynUFhH5LiEPvAEgSnwMqPN4hf/8uRe82nDl5qP5agrp2el1h0HzyBpbvHaW7NB0BPrtvA==
 
-"@quasar/quasar-app-extension-qcalendar@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qcalendar/-/quasar-app-extension-qcalendar-2.4.0.tgz#d985c10884f292b992e61eb3b3981aa6c585f3a3"
-  integrity sha512-8lKnb3MonHJFbsN/vPK256qFLV8hRoqVPy118v5aZdONz8JGx9CUDr7iMvbwGDEN0JbzJZJRfllB/4MJb+UcQA==
+"@quasar/quasar-app-extension-qcalendar@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qcalendar/-/quasar-app-extension-qcalendar-2.5.0.tgz#c8cefd697997d9d7f35db80453395b64fd5e0d41"
+  integrity sha512-GZNNIph2ZzbkrjPSWI5px2fs0K8r/P50DsL9JKBmYwMvBikPmjnzDJo42RhLSkSgOSLj9dwlZWLiWKS19XpaBA==
   dependencies:
-    "@quasar/quasar-ui-qcalendar" "^2.4.0"
+    "@quasar/quasar-ui-qcalendar" "^2.5.0"
 
-"@quasar/quasar-app-extension-qmarkdown@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qmarkdown/-/quasar-app-extension-qmarkdown-1.2.1.tgz#44c5fa0c46c0ffc41561ccbb11a63f150976a0c9"
-  integrity sha512-7L5zkU4ku0hjhWeGB2JjJNZ6zgqWWWU/0/WeB+WQBZEHmajeGESKbOX7zNMlLdS01dHEEp7hGVvVrGjjfGqJZg==
+"@quasar/quasar-app-extension-qmarkdown@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@quasar/quasar-app-extension-qmarkdown/-/quasar-app-extension-qmarkdown-1.4.1.tgz#bb586466345b662d0ee8b752439f427ce6f2ec74"
+  integrity sha512-npHZRV17OrLVrW/QdC94laxFA2VK27+ya16Rm4v0ApCbkVDC7vUBSKV4bNp0o/FJHRRwaC44JByNrgBF6J03Rw==
   dependencies:
-    "@quasar/quasar-ui-qmarkdown" "^1.2.1"
+    "@quasar/quasar-ui-qmarkdown" "^1.4.1"
     front-matter "^4.0.2"
     raw-loader "^4.0.2"
     ware-loader "^0.2.4"
 
-"@quasar/quasar-ui-qcalendar@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@quasar/quasar-ui-qcalendar/-/quasar-ui-qcalendar-2.4.0.tgz#5214fa27f3c54198350fb4e86937606244186b78"
-  integrity sha512-zH+ktgu96I0CUDK9GXwhkkS/O/0n9WWvNGe9tARQ48SL1HM2pNQnEKv/jbq7EdG/q9w7nhKUrukgufImvmvCFQ==
+"@quasar/quasar-ui-qcalendar@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@quasar/quasar-ui-qcalendar/-/quasar-ui-qcalendar-2.5.0.tgz#ca5c4630258a81b4993c53f1df9fa4d2308370f4"
+  integrity sha512-9glf9JaJUl8PgjOjZ/J7l2yzf0z9SYzKI9JdWVuLfiLyWkGoKor+W+7WpoXEnHQuA2lMrqiZbSWm/5Y1KBrN1A==
   dependencies:
     q-colorize-mixin "^1.0.9"
     q-theme-mixin "^1.0.1"
 
-"@quasar/quasar-ui-qmarkdown@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@quasar/quasar-ui-qmarkdown/-/quasar-ui-qmarkdown-1.2.1.tgz#8d178cdc1db3db42e429209eda0bf3d80b1dcb97"
-  integrity sha512-kf8EXy7oKEKM+rCnbvwuawHspHSF+wLtENuq98qZpJyXxdfgPIQcnDSeKDGvNF6cCi3eaEwyZ5dq+AXfT1nFZQ==
+"@quasar/quasar-ui-qmarkdown@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@quasar/quasar-ui-qmarkdown/-/quasar-ui-qmarkdown-1.4.1.tgz#4ceb1e58f8f56ca8cea2c552d6d256b49247d270"
+  integrity sha512-KLVv6nVSzxyvBEeDoJK+ITE6IfTMTdzU9r23KZzNZE23vpLBRzy/OarATCgRz9xkJGv77q39HPWSKUiue79o4w==
   dependencies:
-    markdown-it "^12.0.2"
+    markdown-it "^12.0.4"
     markdown-it-abbr "^1.0.4"
     markdown-it-container "^3.0.0"
     markdown-it-deflist "^2.1.0"
     markdown-it-emoji "^2.0.0"
     markdown-it-footnote "^3.0.2"
     markdown-it-imsize "^2.0.1"
-    markdown-it-ins "^3.0.0"
-    markdown-it-mark "^3.0.0"
+    markdown-it-ins "^3.0.1"
+    markdown-it-mark "^3.0.1"
     markdown-it-sub "^1.0.0"
     markdown-it-sup "^1.0.0"
     markdown-it-task-lists "^2.1.1"
     markdown-it-toc-and-anchor "^4.2.0"
-    prismjs "^1.22.0"
+    prismjs "^1.23.0"
 
 "@sentry/browser@^5.15.0":
   version "5.27.0"
@@ -4202,10 +4202,10 @@ entities@^2.0.0:
   resolved "https://registry.yarnpkg.com/entities/-/entities-2.0.0.tgz#68d6084cab1b079767540d80e56a39b423e4abf4"
   integrity sha512-D9f7V0JSRwIxlRI2mjMqufDrRDnx8p+eEOz7aUM9SuvF8gsBzra0/6tbjl1m8eQHrZlYj6PxqE00hZ1SAIKPLw==
 
-entities@~2.0.0:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/entities/-/entities-2.0.3.tgz#5c487e5742ab93c15abb5da22759b8590ec03b7f"
-  integrity sha512-MyoZ0jgnLvB2X3Lg5HqpFmn1kybDiIfEQmKzTb5apr51Rb+T3KdmMiqa70T+bhGnyv7bQ6WMj2QMHpGMmlrUYQ==
+entities@~2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-2.1.0.tgz#992d3129cf7df6870b96c57858c249a120f8b8b5"
+  integrity sha512-hCx1oky9PFrJ611mf0ifBLBRW8lUUVRlFolb5gWRfIELabBlbp9xZvrqZLZAs+NxFnbfQoeGd8wDkygjg7U85w==
 
 env-paths@^2.2.0:
   version "2.2.0"
@@ -6704,15 +6704,15 @@ markdown-it-imsize@^2.0.1:
   resolved "https://registry.yarnpkg.com/markdown-it-imsize/-/markdown-it-imsize-2.0.1.tgz#cca0427905d05338a247cb9ca9d968c5cddd5170"
   integrity sha1-zKBCeQXQUziiR8ucqdloxc3dUXA=
 
-markdown-it-ins@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/markdown-it-ins/-/markdown-it-ins-3.0.0.tgz#b1b56824c78dc66e52b0fc97531b317cd78d79d2"
-  integrity sha512-+vyAdBuMGwmT2yMlAFJSx2VR/0QZ1onQ/Mkkmr4l9tDFOh5sVoAgRbkgbuSsk+sxJ9vaMH/IQ323ydfvQrPO/Q==
+markdown-it-ins@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/markdown-it-ins/-/markdown-it-ins-3.0.1.tgz#c09356b917cf1dbf73add0b275d67ab8c73d4b4d"
+  integrity sha512-32SSfZqSzqyAmmQ4SHvhxbFqSzPDqsZgMHDwxqPzp+v+t8RsmqsBZRG+RfRQskJko9PfKC2/oxyOs4Yg/CfiRw==
 
-markdown-it-mark@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/markdown-it-mark/-/markdown-it-mark-3.0.0.tgz#27c3e39ef3cc310b2dde5375082c9fa912983cda"
-  integrity sha512-HqMWeKfMMOu4zBO0emmxsoMWmbf2cPKZY1wP6FsTbKmicFfp5y4L3KXAsNeO1rM6NTJVOrNlLKMPjWzriBGspw==
+markdown-it-mark@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/markdown-it-mark/-/markdown-it-mark-3.0.1.tgz#51257db58787d78aaf46dc13418d99a9f3f0ebd3"
+  integrity sha512-HyxjAu6BRsdt6Xcv6TKVQnkz/E70TdGXEFHRYBGLncRE9lBFwDNLVtFojKxjJWgJ+5XxUwLaHXy+2sGBbDn+4A==
 
 markdown-it-sub@^1.0.0:
   version "1.0.0"
@@ -6737,13 +6737,13 @@ markdown-it-toc-and-anchor@^4.2.0:
     clone "^2.1.0"
     uslug "^1.0.4"
 
-markdown-it@^12.0.2:
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-12.0.2.tgz#4401beae8df8aa2221fc6565a7188e60a06ef0ed"
-  integrity sha512-4Lkvjbv2kK+moL9TbeV+6/NHx+1Q+R/NIdUlFlkqkkzUcTod4uiyTJRiBidKR9qXSdkNFkgv+AELY8KN9vSgVA==
+markdown-it@^12.0.4:
+  version "12.0.4"
+  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-12.0.4.tgz#eec8247d296327eac3ba9746bdeec9cfcc751e33"
+  integrity sha512-34RwOXZT8kyuOJy25oJNJoulO8L0bTHYWXcdZBYZqFnjIy3NgjeoM3FmPXIOFQ26/lSHYMr8oc62B6adxXcb3Q==
   dependencies:
     argparse "^2.0.1"
-    entities "~2.0.0"
+    entities "~2.1.0"
     linkify-it "^3.0.1"
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
@@ -8301,10 +8301,10 @@ pretty-error@^2.0.2:
     renderkid "^2.0.1"
     utila "~0.4"
 
-prismjs@^1.22.0:
-  version "1.22.0"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.22.0.tgz#73c3400afc58a823dd7eed023f8e1ce9fd8977fa"
-  integrity sha512-lLJ/Wt9yy0AiSYBf212kK3mM5L8ycwlyTlSxHBAneXLR0nzFMlZ5y7riFPF3E33zXOF2IH95xdY5jIyZbM9z/w==
+prismjs@^1.23.0:
+  version "1.23.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.23.0.tgz#d3b3967f7d72440690497652a9d40ff046067f33"
+  integrity sha512-c29LVsqOaLbBHuIbsTxaKENh1N2EQBOHaWv7gkHN4dgRbxSREqDnDbtFJYdpPauS4YCplMSNCABQ6Eeor69bAA==
   optionalDependencies:
     clipboard "^2.0.0"
 
@@ -8443,10 +8443,10 @@ quasar-app-extension-q-filter-configurator@^1.2.0:
   resolved "https://registry.yarnpkg.com/quasar-app-extension-q-filter-configurator/-/quasar-app-extension-q-filter-configurator-1.2.0.tgz#20b5a67e4a1e71a939c4f229b1fc21293427aed2"
   integrity sha512-jvSByqP8IgcA3hR8WdOX63Ok9CvudtBq75Gj/CjOchwpQ86722KMAaPmeJt+/3EH0SIEzSaaYVd2VYJHCxkksQ==
 
-quasar@^1.14.5:
-  version "1.14.5"
-  resolved "https://registry.yarnpkg.com/quasar/-/quasar-1.14.5.tgz#dd432ea9b0d7d7e7cedf12e2d8a20d35e944d4e9"
-  integrity sha512-K/rYbL5U8Wel31Lqr6VIJcWNXIoa4DSfNQ56Yrw+H/AKSmWMsyDyQcPYX9qMjhaSvEd/HOIIBdfOxx+eO6weAA==
+quasar@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/quasar/-/quasar-1.15.0.tgz#aa4896e3dab46342986a79617e26c2da0db8ea4d"
+  integrity sha512-GTIz/8AgzpHKPsbrQfO32dPPEGjDSFDWRE4dvt3AHh2LtRRAE5QJwPMqCy11GYGhyLMeZaRl76AuCUVb0BYTzA==
 
 query-string@^4.1.0:
   version "4.3.4"
@@ -10422,6 +10422,11 @@ vue-loader@15.9.2:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-native-websocket@^2.0.14:
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/vue-native-websocket/-/vue-native-websocket-2.0.14.tgz#fddb56f9f93d2ecc861486ee3c8f29506ea2a168"
+  integrity sha512-oK8+xG1gmqRs4JngHGwEc4zWoRjsdMB20Sz8pemkh4lW2Vr2676/cDRtd30aGnO2xF7Oxf003wS5JO0kypUsCw==
 
 vue-pluralize@0.0.2:
   version "0.0.2"

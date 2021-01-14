@@ -62,11 +62,13 @@
         </q-item-label>
         <q-item-label caption>
           <q-badge :color="item.color" text-color="black">
+            <!--
             <q-icon
               :name="item.icon"
               size="20px"
               class="q-ml-xs"
             />
+          -->
             {{item.value}}
           </q-badge>
         </q-item-label>
@@ -96,6 +98,8 @@
         <IEcharts v-else style="height: 250px" :option="rok" :resizable="true"/>
       </q-card>
     </div>
+    <p align="center">*(Dane odświeżane co godzinę)</p>
+    <Error ref="err"/>
   </q-page>
 </template>
 
@@ -104,13 +108,16 @@ import IEcharts from 'vue-echarts-v3/src/full.js'
 import VueNativeSock from 'vue-native-websocket'
 import Vue from 'vue'
 import { date } from 'quasar'
+import { apolloQuery } from '../boot/ioia.js'
+import Error from 'components/Error'
 
 Vue.use(VueNativeSock, 'wss://red.ioia.io/ws', { format: 'json', reconnection: true })
 
 export default {
   name: 'Dashboard2',
   components: {
-    IEcharts
+    IEcharts,
+    Error
   },
   watch: {
     $route: function (newVal) {
@@ -119,72 +126,42 @@ export default {
   },
   mounted () {
     this.bread()
-    // this.$q.loading.show()
+    apolloQuery(
+      `query($app: String!) {
+          vDashboards(condition: {project: $app}) {
+            nodes {
+              average
+              month
+              week
+              year
+              total
+              gDay
+            }
+          }
+      }`,
+      {
+        app: this.$route.params.app
+      },
+      this.loadCallback
+    )
   },
   data () {
     return {
       status: 0,
+      years: [],
       activity: '',
       pie: ['Wykres1', 'Wykres2', 'Wykres3', 'Wykres4'],
-      chart: ['Dzień', 'Miesiąc', 'Rok'],
+      chart: ['Dzień*', 'Miesiąc*', 'Rok*'],
       option: ['dzien', 'dzien', 'dzien'],
       info: [
         { title: 'Dzienny uzysk', value: 0, icon: 'trending_flat' },
-        { title: 'Średnio szt/h', value: 0, icon: 'trending_flat' },
-        { title: 'Bieżący tydzień', value: 0, icon: 'trending_flat' },
-        { title: 'Produkcja listopad', value: 0, icon: 'trending_flat' },
-        { title: 'Produkcja 2020', value: 0, icon: 'trending_flat' },
-        { title: 'Produkcja całkowita', value: 0, icon: 'trending_flat' }
+        { title: 'Średnio szt/h*', value: 0, icon: 'trending_flat' },
+        { title: 'Bieżący tydzień*', value: 0, icon: 'trending_flat' },
+        { title: 'Bieżący miesiąc*', value: 0, icon: 'trending_flat' },
+        { title: 'Bieżący rok*', value: 0, icon: 'trending_flat' },
+        { title: 'Produkcja całkowita*', value: 0, icon: 'trending_flat' }
       ],
-      data: [
-        [40, 45, 27, 50, 32, 50, 70, 30, 30, 40, 67, 29],
-        [40, 45, 27, 50, 32, 50, 70, 30, 30, 40, 67, 29],
-        [40, 45, 27, 50, 32, 50, 70, 30, 30, 40, 67, 29]
-      ]
-    }
-  },
-  computed: {
-    dzien () {
-      return {
-        tooltip: {
-          trigger: 'axis',
-          axisPointer: { // Coordinate axis indicator, coordinate axis trigger is valid
-            type: 'shadow' // The default is a straight line, optional:'line' |'shadow'
-          }
-        },
-        grid: {
-          left: '2%',
-          right: '2%',
-          top: '4%',
-          bottom: '3%',
-          containLabel: true
-        },
-        xAxis: [
-          {
-            type: 'category',
-            data: [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
-          }
-        ],
-        yAxis: [
-          {
-            type: 'value',
-            splitLine: {
-              show: false
-            }
-          }
-        ],
-        series: [
-          {
-            name: 'Produkcja',
-            type: 'bar',
-            data: this.data[0],
-            color: '#546bfa'
-          }
-        ]
-      }
-    },
-    miesiac () {
-      return {
+      rok: {
         tooltip: {
           trigger: 'axis',
           axisPointer: { // Coordinate axis indicator, coordinate axis trigger is valid
@@ -216,14 +193,12 @@ export default {
           {
             name: 'Produkcja',
             type: 'bar',
-            data: this.data[1],
-            color: '#3a9688'
+            data: [],
+            color: '#02a9f4'
           }
         ]
-      }
-    },
-    rok () {
-      return {
+      },
+      miesiac: {
         tooltip: {
           trigger: 'axis',
           axisPointer: { // Coordinate axis indicator, coordinate axis trigger is valid
@@ -240,7 +215,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: [2014, 2015, 2016, 2017, 2018, 2019, 2020]
+            data: [14]
           }
         ],
         yAxis: [
@@ -255,73 +230,45 @@ export default {
           {
             name: 'Produkcja',
             type: 'bar',
-            data: this.data[2],
-            color: '#02a9f4'
+            data: [],
+            color: '#3a9688'
           }
         ]
-      }
-    },
-    getPieOptions () {
-      return {
+      },
+      dzien: {
         tooltip: {
-          trigger: 'item',
-          formatter: '{a} <br/>{b}: {c} ({d}%)'
+          trigger: 'axis',
+          axisPointer: { // Coordinate axis indicator, coordinate axis trigger is valid
+            type: 'shadow' // The default is a straight line, optional:'line' |'shadow'
+          }
         },
-        legend: {
-          bottom: 0,
-          left: 'center',
-          data: ['Produkt1', 'Produkt2', 'Produkt3', 'Produkt4']
+        grid: {
+          left: '2%',
+          right: '2%',
+          top: '4%',
+          bottom: '3%',
+          containLabel: true
         },
+        xAxis: [
+          {
+            type: 'category',
+            data: []
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            splitLine: {
+              show: false
+            }
+          }
+        ],
         series: [
           {
-            name: 'Sales',
-            type: 'pie',
-            radius: ['40%', '60%'],
-            avoidLabelOverlap: false,
-            label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: false,
-                fontSize: '30',
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data: [
-              {
-                value: 335,
-                name: 'Produkt1',
-                itemStyle: {
-                  color: '#546bfa'
-                }
-              },
-              {
-                value: 310,
-                name: 'Produkt2',
-                itemStyle: {
-                  color: '#3a9688'
-                }
-              },
-              {
-                value: 234,
-                name: 'Produkt3',
-                itemStyle: {
-                  color: '#02a9f4'
-                }
-              },
-              {
-                value: 135,
-                name: 'Produkt4',
-                itemStyle: {
-                  color: '#f88c2b'
-                }
-              }
-            ]
+            name: 'Produkcja',
+            type: 'bar',
+            data: [],
+            color: '#546bfa'
           }
         ]
       }
@@ -338,14 +285,39 @@ export default {
         this.info[0].value = data.worek + ' (' + data.paleta + ' palet)'
         this.activity = date.formatDate(Date.parse(data.data), 'YYYY-MM-DD HH:mm')
       }
-      console.log(data)
+      // console.log(data)
+    },
+    loadCallback (data) {
+      if (data.errors) {
+        this.$refs.err.display(data.errors, 'Dashboard')
+      } else {
+        data = data.data
+        var dash = data.vDashboards.nodes
+        if (dash.length !== 0) {
+          this.info[1].value = dash[0].average
+          this.info[2].value = dash[0].week
+          this.info[3].value = dash[0].month
+          this.info[4].value = dash[0].year
+          this.info[5].value = dash[0].total
+          this.rok.series[0].data = [parseInt(dash[0].month)]
+          this.miesiac.series[0].data = [parseInt(dash[0].month)]
+          var dayL = []
+          var dayD = []
+          dash[0].gDay.forEach((value) => {
+            dayL.push(value.hour)
+            dayD.push(value.worki)
+          })
+          this.dzien.series[0].data = dayD
+          this.dzien.xAxis[0].data = dayL
+        }
+      }
+      this.loading = false
     },
     bread () {
       this.$root.$children[0].$children[0].breadcrumbs = [{ label: 'Strona główna', icon: 'home', to: '/' }]
       if (this.$route.params.app) this.$root.$children[0].$children[0].breadcrumbs.push({ label: this.$route.params.app, icon: undefined, click: '' })
       this.$root.$children[0].$children[0].breadcrumbs.push({ label: 'Dashboard', icon: undefined, click: '' })
       // websocket
-      this.data.status = 0
       this.$options.sockets.onmessage = (data) => this.sock(data)
       this.$options.sockets.onopen = (data) => this.sockopen()
       this.sockopen()

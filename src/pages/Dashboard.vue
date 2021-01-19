@@ -104,7 +104,9 @@
 </template>
 
 <script>
-import IEcharts from 'vue-echarts-v3/src/full.js'
+import IEcharts from 'vue-echarts-v3/src/lite.js'
+import 'echarts/lib/chart/bar'
+import 'echarts/lib/component/tooltip'
 import VueNativeSock from 'vue-native-websocket'
 import Vue from 'vue'
 import { date } from 'quasar'
@@ -136,6 +138,8 @@ export default {
               year
               total
               gDay
+              gMonth
+              gYear
             }
           }
       }`,
@@ -151,7 +155,7 @@ export default {
       years: [],
       activity: '',
       pie: ['Wykres1', 'Wykres2', 'Wykres3', 'Wykres4'],
-      chart: ['Dzień*', 'Miesiąc*', 'Rok*'],
+      chart: ['Dzień (worki)*', 'Miesiąc (palety)*', 'Rok (palety)*'],
       option: ['dzien', 'dzien', 'dzien'],
       info: [
         { title: 'Dzienny uzysk', value: 0, icon: 'trending_flat' },
@@ -194,7 +198,10 @@ export default {
             name: 'Produkcja',
             type: 'bar',
             data: [],
-            color: '#02a9f4'
+            color: '#02a9f4',
+            label: {
+              show: true
+            }
           }
         ]
       },
@@ -228,10 +235,31 @@ export default {
         ],
         series: [
           {
-            name: 'Produkcja',
+            name: 'Zmiana 1',
             type: 'bar',
             data: [],
-            color: '#3a9688'
+            stack: true,
+            label: {
+              show: true
+            }
+          },
+          {
+            name: 'Zmiana 2',
+            type: 'bar',
+            data: [],
+            stack: true,
+            label: {
+              show: true
+            }
+          },
+          {
+            name: 'Zmiana 3',
+            type: 'bar',
+            data: [],
+            stack: true,
+            label: {
+              show: true
+            }
           }
         ]
       },
@@ -268,7 +296,10 @@ export default {
             name: 'Produkcja',
             type: 'bar',
             data: [],
-            color: '#546bfa'
+            color: '#546bfa',
+            label: {
+              show: true
+            }
           }
         ]
       }
@@ -299,8 +330,6 @@ export default {
           this.info[3].value = dash[0].month
           this.info[4].value = dash[0].year
           this.info[5].value = dash[0].total
-          this.rok.series[0].data = [parseInt(dash[0].month)]
-          this.miesiac.series[0].data = [parseInt(dash[0].month)]
           var dayL = []
           var dayD = []
           dash[0].gDay.forEach((value) => {
@@ -309,6 +338,27 @@ export default {
           })
           this.dzien.series[0].data = dayD
           this.dzien.xAxis[0].data = dayL
+          var mthL = [[], [], []]
+          var mthD = [[], [], []]
+          dash[0].gMonth.forEach((value) => {
+            mthL[value.shift - 1].push(value.day)
+            mthD[value.shift - 1].push(value.palety)
+          })
+          this.dzien.series[0].data = dayD
+          this.dzien.xAxis[0].data = dayL
+          this.miesiac.series[0].data = mthD[0]
+          this.miesiac.series[1].data = mthD[1]
+          this.miesiac.series[2].data = mthD[2]
+          this.miesiac.xAxis[0].data = mthL[0]
+          var yeaL = []
+          var yeaD = []
+          dash[0].gYear.forEach((value) => {
+            yeaL.push(value.day)
+            yeaD.push(value.palety)
+          })
+          this.rok.series[0].data = yeaD
+          this.rok.xAxis[0].data = yeaL
+          this.sockopen()
         }
       }
       this.loading = false
@@ -320,7 +370,7 @@ export default {
       // websocket
       this.$options.sockets.onmessage = (data) => this.sock(data)
       this.$options.sockets.onopen = (data) => this.sockopen()
-      this.sockopen()
+      // this.sockopen()
     },
     randomizeFloat (min, max) {
       // return min + (max - min) * Math.random()

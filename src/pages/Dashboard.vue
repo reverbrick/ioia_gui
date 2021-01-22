@@ -99,6 +99,13 @@
       </q-card>
     </div>
     <p align="center">*(Dane odświeżane co godzinę)</p>
+    <p align="center">
+      <download-excel
+        :data   = "xls"
+        :name    = "$route.params.app+'.xls'">
+        <q-icon color="black" name="get_app"/>Dane historyczne
+      </download-excel>
+    </p>
     <Error ref="err"/>
   </q-page>
 </template>
@@ -112,7 +119,9 @@ import Vue from 'vue'
 import { date } from 'quasar'
 import { apolloQuery } from '../boot/ioia.js'
 import Error from 'components/Error'
+import JsonExcel from 'vue-json-excel'
 
+Vue.component('downloadExcel', JsonExcel)
 Vue.use(VueNativeSock, 'wss://red.ioia.io/ws', { format: 'json', reconnection: true })
 
 export default {
@@ -140,6 +149,7 @@ export default {
               gDay
               gMonth
               gYear
+              history
             }
           }
       }`,
@@ -155,7 +165,7 @@ export default {
       years: [],
       activity: '',
       pie: ['Wykres1', 'Wykres2', 'Wykres3', 'Wykres4'],
-      chart: ['Dzień (worki)*', 'Miesiąc (palety)*', 'Rok (palety)*'],
+      chart: ['Dzień (worki)*', 'Miesiąc (tony)*', 'Rok (tony)*'],
       option: ['dzien', 'dzien', 'dzien'],
       info: [
         { title: 'Dzienny uzysk', value: 0, icon: 'trending_flat' },
@@ -182,7 +192,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            data: []
           }
         ],
         yAxis: [
@@ -222,7 +232,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: [14]
+            data: []
           }
         ],
         yAxis: [
@@ -302,7 +312,8 @@ export default {
             }
           }
         ]
-      }
+      },
+      xls: []
     }
   },
   methods: {
@@ -313,7 +324,8 @@ export default {
       data = JSON.parse(data.data)
       if (data.client === this.$route.params.app) {
         this.status = data.status
-        this.info[0].value = data.worek + ' (' + data.paleta + ' palet)'
+        var ton = (data.worek * 15.0) / 1000.0
+        this.info[0].value = data.worek + ' (' + ton.toFixed(2) + ' ton)'
         this.activity = date.formatDate(Date.parse(data.data), 'YYYY-MM-DD HH:mm')
       }
       // console.log(data)
@@ -336,13 +348,14 @@ export default {
             dayL.push(value.hour)
             dayD.push(value.worki)
           })
+          console.log(dayD, dayL)
           this.dzien.series[0].data = dayD
           this.dzien.xAxis[0].data = dayL
           var mthL = [[], [], []]
           var mthD = [[], [], []]
           dash[0].gMonth.forEach((value) => {
             mthL[value.shift - 1].push(value.day)
-            mthD[value.shift - 1].push(value.palety)
+            mthD[value.shift - 1].push(value.tony)
           })
           this.dzien.series[0].data = dayD
           this.dzien.xAxis[0].data = dayL
@@ -354,12 +367,14 @@ export default {
           var yeaD = []
           dash[0].gYear.forEach((value) => {
             yeaL.push(value.day)
-            yeaD.push(value.palety)
+            yeaD.push(value.tony)
           })
           this.rok.series[0].data = yeaD
           this.rok.xAxis[0].data = yeaL
+          this.xls = dash[0].history
           this.sockopen()
         }
+        // this.xls = data.vMr009Data.nodes
       }
       this.loading = false
     },
@@ -375,37 +390,6 @@ export default {
     randomizeFloat (min, max) {
       // return min + (max - min) * Math.random()
       return min + Math.floor((max - min) * Math.random())
-    },
-    roll () {
-      const tr = [
-        'trending_up',
-        'trending_down',
-        'trending_flat'
-      ]
-      const col = [
-        'green',
-        'red',
-        'grey'
-      ]
-      this.status = this.randomizeFloat(1, 4)
-      for (var i = 0; i < this.info.length; i++) {
-        var z = this.randomizeFloat(10, 30)
-        if (i === 0) this.info[i].value = z * 12
-        else if (i === 1) this.info[i].value = z
-        else if (i === 2) this.info[i].value = z * 12 * 7
-        else if (i === 3) this.info[i].value = z * 12 * 30
-        else if (i === 4) this.info[i].value = z * 12 * 365
-        else if (i === 5) this.info[i].value = z * 12 * 365 * 5
-        var x = this.randomizeFloat(0, 3)
-        this.info[i].icon = tr[x]
-        this.info[i].color = col[x]
-      }
-      for (var j = 0; j < 12; j++) {
-        var y = this.randomizeFloat(10, 30) * 12
-        this.data[0][j] = y
-        this.data[1][j] = y * 30
-        this.data[2][j] = y * 365
-      }
     }
   }
 }

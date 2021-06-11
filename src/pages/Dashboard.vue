@@ -86,8 +86,8 @@
       </q-card>
     </div>
   -->
-    <div class="row items-start justify-center q-gutter-md">
-      <q-card v-for="(item, i) in chart" v-bind:key="i" class="col-3 col-md-3">
+    <div v-for="(item, i) in chart" v-bind:key="i" class="row items-start justify-center q-gutter-md">
+      <q-card class="col-10 col-md-10 col-sm-12">
         <q-item>
           <q-item-section>
             <q-item-label>{{item}}</q-item-label>
@@ -348,7 +348,7 @@ export default {
             dayL.push(value.hour)
             dayD.push(value.worki)
           })
-          console.log(dayD, dayL)
+          // console.log(dayD, dayL)
           this.dzien.series[0].data = dayD
           this.dzien.xAxis[0].data = dayL
           var mthL = [[], [], []]
